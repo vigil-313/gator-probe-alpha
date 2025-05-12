@@ -2,6 +2,8 @@
 
 This directory contains configurations for the Legal Gator Panel - personas focused on legal risk assessment, intellectual property considerations, and contractual matters.
 
+> ⚠️ **IMPORTANT LEGAL NOTICE**: For detailed information on Legal Gator capabilities, limitations, and appropriate usage, please review `/Technical/LEGAL_GATOR_LIMITS.md`. Legal gator personas are NOT licensed attorneys and do NOT provide legal advice.
+
 ## Available Personas
 
 | ID | Name | Nickname | Archetype | Focus |
@@ -39,6 +41,22 @@ The Legal Panel personas represent different domains of legal expertise:
 
 Together, they provide comprehensive legal risk assessment across multiple domains, helping founders identify potential issues before they become problems.
 
-## Important Disclaimer
+## Reliability Framework
 
-These personas do not provide actual legal advice and must not be treated as legal counsel. They are designed to raise awareness of potential legal issues that users should discuss with qualified legal professionals. Each persona includes a legal disclaimer to this effect.
+As outlined in `/Technical/LEGAL_GATOR_LIMITS.md`, Legal Gators are appropriate for:
+- Explaining legal concepts in plain language ✅
+- Identifying potential risk patterns or red flags ✅
+- Asking critical legal questions you might overlook ✅
+- Educating non-lawyers about legal structures or concerns ✅
+
+They are **NOT appropriate** for:
+- Interpreting laws based on jurisdictional specificity ❌
+- Determining legal enforceability of clauses ❌
+- Providing regulatory clearance or compliance assurance ❌
+- Replacing professional legal advice ❌❌
+
+## Mandatory Disclaimer
+
+> **Important Notice:** The legal gators in Valugator are fictional AI personas trained on general knowledge of legal concepts, contracts, and regulatory frameworks. They **are not licensed attorneys**, do not practice law, and do **not provide legal advice**. Their feedback is intended solely for **educational and analytical purposes**. You must consult a **licensed legal professional** before making any legal decisions.
+
+Each legal gator persona includes this disclaimer in its configuration, and the disclaimer must be displayed to users whenever legal gator responses are provided.

@@ -60,13 +60,18 @@
 
 - [CON-PROBE-008]: Legal Panel
   - Definition: Panel of gator personas focused on legal risk assessment
-  - Related: [CON-PROBE-001], [CON-PROBE-003], [CON-PROBE-009]
+  - Related: [CON-PROBE-001], [CON-PROBE-003], [CON-PROBE-009], [CON-PROBE-010]
   - Documents: [DOC-TECH-PERS-1]
 
 - [CON-PROBE-009]: Panel-Specific Prompt Templates
   - Definition: Structured templates tailored to different panel types
   - Related: [CON-PROBE-002], [CON-PROBE-006], [CON-PROBE-007], [CON-PROBE-008]
   - Documents: [DOC-TECH-PROM-1]
+
+- [CON-PROBE-010]: Legal Gator Limits
+  - Definition: Capabilities, limitations, and appropriate usage guidelines for legal AI personas
+  - Related: [CON-PROBE-008], [CON-PROBE-009]
+  - Documents: [DOC-GATOR-LAW-TRUTH-001]
 
 ## System Relationships
 1. [CON-SYS-001] → implements → [CON-SYS-002]
@@ -85,6 +90,8 @@
 8. [CON-PROBE-006] → uses template → [CON-PROBE-009]
 9. [CON-PROBE-007] → uses template → [CON-PROBE-009]
 10. [CON-PROBE-008] → uses template → [CON-PROBE-009]
+11. [CON-PROBE-008] → constrained by → [CON-PROBE-010]
+12. [CON-PROBE-010] → informs → [CON-PROBE-009] for legal panel
 
 ## Visual Representation
 ### Documentation System
@@ -106,17 +113,17 @@ Documentation System
         │             ┌───────────┴─────────────┐
         │             │                         │
         │    ┌────────▼─────┐ ┌────────▼─────┐ ┌▼───────────┐
-        │    │  Evaluation  │ │  Pathfinder  │ │   Legal    │
-        │    │   Chamber    │ │   Council    │ │   Panel    │
-        │    │(CON-PROBE-006)│ │(CON-PROBE-007)│ │(CON-PROBE-008)│
-        │    └────────┬─────┘ └────────┬─────┘ └┬───────────┘
-        │             │                │        │
-        │             └────────┬───────┴────────┘
-        │                      │
-        │             ┌────────▼────────┐
-        │             │  Panel Template │
-        │             │(CON-PROBE-009)  │
-        │             └────────┬────────┘
+        │    │  Evaluation  │ │  Pathfinder  │ │   Legal    │◄─────┐
+        │    │   Chamber    │ │   Council    │ │   Panel    │      │
+        │    │(CON-PROBE-006)│ │(CON-PROBE-007)│ │(CON-PROBE-008)│      │
+        │    └────────┬─────┘ └────────┬─────┘ └┬───────────┘      │
+        │             │                │        │                   │
+        │             └────────┬───────┴────────┘                   │
+        │                      │                                    │
+        │             ┌────────▼────────┐              ┌────────────▼─────────┐
+        │             │  Panel Template │              │   Legal Gator Limits  │
+        │             │(CON-PROBE-009)  │              │   (CON-PROBE-010)    │
+        │             └────────┬────────┘              └──────────────────────┘
         │                      │
         └──────────┬───────────┘
                    ▼
@@ -170,5 +177,29 @@ Documentation System
 └────────────────────────────────────────────┘
 ```
 
+### Legal Persona Trust Framework
+```
+┌─ Legal Gator Trust Framework ──────────────────────┐
+│                                                    │
+│ ┌─────────────────┐       ┌──────────────────────┐ │
+│ │ CAN DO (✅)      │       │ CANNOT DO (❌)        │ │
+│ │ - Explain terms │       │ - Interpret laws     │ │
+│ │ - Identify risks│       │ - Determine validity │ │
+│ │ - Ask questions │       │ - Provide clearance  │ │
+│ │ - Educate users │       │ - Replace lawyers    │ │
+│ └─────────────────┘       └──────────────────────┘ │
+│                                                    │
+│ ┌──────────────────────────────────────────────┐   │
+│ │ MANDATORY DISCLAIMER                          │   │
+│ │ "I am an AI character, not a licensed        │   │
+│ │ attorney. This analysis is for educational    │   │
+│ │ purposes only and does not constitute legal   │   │
+│ │ advice. Consult qualified legal professionals │   │
+│ │ before making any legal decisions."           │   │
+│ └──────────────────────────────────────────────┘   │
+│                                                    │
+└────────────────────────────────────────────────────┘
+```
+
 ## Last Updated
-2025-05-12 18:30:00 PDT | SESSION-002 | Claude
+2025-05-12 19:30:00 PDT | SESSION-003 | Claude
