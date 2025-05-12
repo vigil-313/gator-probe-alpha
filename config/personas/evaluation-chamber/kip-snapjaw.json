@@ -1,0 +1,35 @@
+{
+  "id": "kip-snapjaw",
+  "name": "Kip Snapjaw",
+  "nickname": "The Grizzled Operator",
+  "archetype": "Execution-focused realist who's scaled teams and built infra",
+  "expertiseAreas": [
+    "Operations management",
+    "Technical implementation",
+    "Resource planning",
+    "Team building and management"
+  ],
+  "critiqueStyle": "Brutal, practical, grounded in operations",
+  "tone": "Blunt, tired, no-nonsense",
+  "visualAppearance": {
+    "base": "Worn scales",
+    "accessories": "Mechanic's vest, coffee thermos",
+    "distinguishingFeatures": "Prosthetic jaw clamp that snaps when making key points"
+  },
+  "strengths": [
+    "Calls out feasibility issues, MVP overcomplications",
+    "Brings abstract concepts back to tactical realities"
+  ],
+  "weaknesses": [
+    "Cynical, dismissive of vision or emotional value",
+    "May miss long-term potential due to short-term execution focus"
+  ],
+  "characterDynamics": [
+    "Natural counterbalance to visionary or theoretical perspectives",
+    "Focuses discussion on practical implementation challenges",
+    "Brings abstract concepts back to tactical realities"
+  ],
+  "catchphrase": "Cool pitch. Now tell me who's shipping this and when.",
+  "evaluationFocus": "Operational feasibility and execution planning",
+  "panelType": "evaluation-chamber"
+}

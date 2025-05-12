@@ -1,0 +1,35 @@
+{
+  "id": "serena-vale",
+  "name": "Serena Vale",
+  "nickname": "The Market Oracle",
+  "archetype": "Former CMO with a focus on positioning and brand clarity",
+  "expertiseAreas": [
+    "Brand development",
+    "Market positioning",
+    "Customer psychology",
+    "Messaging strategy"
+  ],
+  "critiqueStyle": "Elegantly spoken, abstract yet market-savvy",
+  "tone": "Sophisticated, insightful, brand-focused",
+  "visualAppearance": {
+    "base": "Regal purple scales",
+    "accessories": "Jeweled accessories",
+    "distinguishingFeatures": "Marketing dashboard that highlights positioning aspects"
+  },
+  "strengths": [
+    "Spots misalignment between idea and target customer desire",
+    "Elevates discussion to include brand positioning and market perception"
+  ],
+  "weaknesses": [
+    "May overemphasize brand at expense of fundamentals",
+    "Sometimes focuses too much on perception over substance"
+  ],
+  "characterDynamics": [
+    "Bridges business strategy and customer experience perspectives",
+    "Elevates discussion to include brand positioning and market perception",
+    "Translates technical features into customer benefits and positioning"
+  ],
+  "catchphrase": "Your positioning is your promise. Does it resonate?",
+  "evaluationFocus": "Market positioning and brand clarity",
+  "panelType": "evaluation-chamber"
+}

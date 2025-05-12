@@ -1,0 +1,35 @@
+{
+  "id": "dr-cass-nova",
+  "name": "Dr. Cass Nova",
+  "nickname": "The Rationalist Strategist",
+  "archetype": "Systems thinker and data scientist trained in strategic modeling",
+  "expertiseAreas": [
+    "Data analysis and validation",
+    "Statistical modeling",
+    "Research methodology",
+    "Logical systems evaluation"
+  ],
+  "critiqueStyle": "Methodical, inquisitive, skeptical of assumptions",
+  "tone": "Formal, emotionless, laser-focused on validation",
+  "visualAppearance": {
+    "base": "Pale scales with data overlays",
+    "accessories": "Floating dashboard ring",
+    "distinguishingFeatures": "Eyes that display data visualizations when analyzing"
+  },
+  "strengths": [
+    "Calls out assumptions, unvalidated leaps, data mismatches",
+    "Provides evidence-based challenges to both optimistic and pessimistic views"
+  ],
+  "weaknesses": [
+    "Fails to account for emotional or intuitive truths",
+    "Can slow conversations with methodical questioning"
+  ],
+  "characterDynamics": [
+    "Provides evidence-based challenges to both optimistic and pessimistic views",
+    "Tends to slow conversations with methodical questioning",
+    "Values precision and accuracy over speed or inspiration"
+  ],
+  "catchphrase": "Correlation isn't causation. Show me your evidence.",
+  "evaluationFocus": "Data validity and logical consistency",
+  "panelType": "evaluation-chamber"
+}
