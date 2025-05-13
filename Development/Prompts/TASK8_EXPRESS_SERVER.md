@@ -1,0 +1,98 @@
+# IMPLEMENTATION TASK 8: Express Server and API Endpoints
+
+## Context
+The VALUGATOR Probe Alpha project needs an Express server to provide API endpoints for the frontend. This server will integrate all the components we've built so far: the configuration loader, prompt assembly module, and LLM API client.
+
+## Objective
+Implement an Express server that:
+1. Provides API endpoints for generating gator responses
+2. Serves the static frontend files
+3. Includes proper error handling
+4. Implements input validation
+5. Follows RESTful API design principles
+
+## Starting Point
+- The configuration loader, prompt assembly module, and LLM API client have been implemented
+- We need to create an Express server that integrates these components
+- The server should provide API endpoints and serve static files
+
+## Requirements
+- Create an Express server
+- Implement API endpoints for generating responses
+- Implement endpoint for retrieving available personas
+- Add middleware for request validation
+- Add error handling middleware
+- Configure static file serving
+- Follow RESTful API design principles
+- Include proper logging
+
+## Steps
+1. Create the main server file at `/src/server.js`:
+   - Import required modules
+   - Initialize Express app
+   - Configure middleware
+   - Initialize components (config loader, prompt assembler, LLM client)
+   - Define routes
+   - Start the server
+
+2. Implement API endpoint for generating responses:
+   - Create POST endpoint at `/api/generate`
+   - Validate input parameters (personaId, userInput)
+   - Use prompt assembler to create prompt
+   - Use LLM client to generate response
+   - Return formatted response
+
+3. Implement API endpoint for retrieving personas:
+   - Create GET endpoint at `/api/personas`
+   - Return list of available personas with metadata
+   - Include panel type and display name information
+
+4. Implement input validation:
+   - Create validation middleware
+   - Validate required fields
+   - Validate field formats and constraints
+   - Return appropriate error responses
+
+5. Implement error handling middleware:
+   - Create error handling middleware
+   - Handle different types of errors
+   - Return appropriate status codes and messages
+   - Include logging
+
+6. Configure static file serving:
+   - Serve files from the `/src/public` directory
+   - Configure appropriate caching headers
+   - Handle SPA routing if needed
+
+## References
+- [DOC-DEV-IMPL-EXT-1]: Implementation Extensibility Guidelines
+- [DOC-TECH-API-1]: API Integration Architecture
+- [DOC-TECH-UI-1]: User Interface Specifications
+
+## Constraints
+- Follow Express best practices
+- Use middleware for cross-cutting concerns
+- Keep routes organized and maintainable
+- Return proper HTTP status codes
+- Follow RESTful design principles
+- Include proper error handling
+- Do not expose sensitive information in responses
+
+## Expected Output
+A fully functioning Express server with:
+- API endpoint for generating responses
+- API endpoint for retrieving personas
+- Static file serving
+- Input validation
+- Error handling
+- Proper logging
+
+## Validation
+- The server should start without errors
+- API endpoints should return expected responses
+- Error handling should return appropriate status codes and messages
+- Static files should be served correctly
+- Input validation should prevent invalid requests
+
+## Next Steps
+After implementing the Express server, we will create unit tests for the server (TASK9) and then implement the minimal frontend UI (TASK10).

@@ -53,37 +53,39 @@ The implementation will follow this streamlined MVP sequence:
    - Create detailed designs with extension points
    - Establish 7-day implementation timeline
    - Document component interfaces and relationships
+   - Create implementation task prompts [✅ SESSION-005]
 
-3. **Development Phase** 🔜
+3. **Development Phase** 🟡
    - **Day 1-2: Configuration Module**
-     - Project scaffolding (directory structure, package.json, etc.)
-     - Configuration loader implementation with basic validation
-     - Unit tests for configuration loading
+     - Project scaffolding (directory structure, package.json, etc.) [TASK1_PROJECT_SETUP]
+     - Configuration loader implementation with basic validation [TASK2_CONFIG_LOADER]
+     - Unit tests for configuration loading [TASK3_CONFIG_LOADER_TESTS]
 
    - **Day 3-4: Prompt Assembly Module**
-     - Template processing system implementation
-     - Persona attribute extraction logic
-     - Complete prompt assembly with extension points
-     - Unit tests for prompt assembly
+     - Template processing system implementation [TASK4_PROMPT_ASSEMBLY]
+     - Persona attribute extraction logic [TASK4_PROMPT_ASSEMBLY]
+     - Complete prompt assembly with extension points [TASK4_PROMPT_ASSEMBLY]
+     - Unit tests for prompt assembly [TASK5_PROMPT_ASSEMBLY_TESTS]
 
    - **Day 5-6: API Integration & Server**
-     - LLM API client with provider pattern
-     - Claude provider implementation
-     - Basic error handling
-     - Express server setup with API endpoints
-     - Integration testing
+     - LLM API client with provider pattern [TASK6_LLM_API_CLIENT]
+     - Claude provider implementation [TASK6_LLM_API_CLIENT]
+     - Basic error handling [TASK6_LLM_API_CLIENT]
+     - Unit tests for API client [TASK7_LLM_API_CLIENT_TESTS]
+     - Express server setup with API endpoints [TASK8_EXPRESS_SERVER]
+     - Server integration testing [TASK9_EXPRESS_SERVER_TESTS]
 
    - **Day 7: UI & End-to-End Integration**
-     - HTML form and response display
-     - CSS styling for readability
-     - JavaScript for form handling and API interaction
-     - End-to-end testing
-     - Final QA and bug fixes
+     - HTML form and response display [TASK10_FRONTEND_UI]
+     - CSS styling for readability [TASK10_FRONTEND_UI]
+     - JavaScript for form handling and API interaction [TASK10_FRONTEND_UI]
+     - End-to-end testing [TASK11_END_TO_END_TESTING]
+     - Final QA and bug fixes [TASK11_END_TO_END_TESTING]
 
 4. **Documentation & Handoff** 🔜
-   - Update technical documentation with implementation details
-   - Create usage guide for the probe
-   - Document lessons learned for future iterations
+   - Update technical documentation with implementation details [TASK12_DOCUMENTATION_DEPLOYMENT]
+   - Create usage guide for the probe [TASK12_DOCUMENTATION_DEPLOYMENT]
+   - Document lessons learned for future iterations [TASK12_DOCUMENTATION_DEPLOYMENT]
 
 ## Component Breakdown
 
@@ -129,16 +131,20 @@ The implementation will follow this streamlined MVP sequence:
 
 ## Progress Tracking
 
-| Component | Status | Notes |
-|-----------|--------|-------|
-| Persona Schema | ✅ Complete | Defined in PERSONA_SCHEMA.md |
-| Persona Configurations | ✅ Complete | Created all 29 personas across 3 panels |
-| Prompt Templates | ✅ Complete | Created templates for all panel types |
-| Configuration Loader | 🔜 Not Started | |
-| Template Processor | 🔜 Not Started | |
-| Prompt Assembler | 🔜 Not Started | |
-| API Client | 🔜 Not Started | |
-| User Interface | 🔜 Not Started | |
+| Component | Status | Task Reference | Notes |
+|-----------|--------|---------------|-------|
+| Persona Schema | ✅ Complete | | Defined in PERSONA_SCHEMA.md |
+| Persona Configurations | ✅ Complete | | Created all 29 personas across 3 panels |
+| Prompt Templates | ✅ Complete | | Created templates for all panel types |
+| Implementation Task Prompts | ✅ Complete | SESSION-005 | Created TASK1-TASK12 implementation prompts |
+| Project Setup | 🟡 Planned | TASK1 | Project scaffolding and configuration |
+| Configuration Loader | 🟡 Planned | TASK2, TASK3 | Implementation and tests |
+| Prompt Assembler | 🟡 Planned | TASK4, TASK5 | Implementation and tests |
+| LLM API Client | 🟡 Planned | TASK6, TASK7 | Implementation and tests |
+| Express Server | 🟡 Planned | TASK8, TASK9 | Implementation and tests |
+| User Interface | 🟡 Planned | TASK10 | Frontend implementation |
+| End-to-End Testing | 🟡 Planned | TASK11 | Integration testing |
+| Documentation | 🟡 Planned | TASK12 | Usage guide and deployment docs |
 
 ## Last Updated
-2025-05-12 18:30:00 PDT | SESSION-002 | Claude
+2025-05-13T03:56:39Z | SESSION-005 | Claude

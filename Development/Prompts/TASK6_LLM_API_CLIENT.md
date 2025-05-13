@@ -1,0 +1,86 @@
+# IMPLEMENTATION TASK 6: LLM API Client
+
+## Context
+The VALUGATOR Probe Alpha project needs to communicate with Large Language Model APIs (starting with Claude) to generate responses based on assembled prompts. The LLM API client module is responsible for this communication, following the provider pattern for extensibility.
+
+## Objective
+Implement an LLM API client that:
+1. Uses the provider pattern for extensibility
+2. Implements Claude API integration for the MVP
+3. Handles API requests and responses
+4. Provides proper error handling and retries
+5. Follows the architecture defined in the extensibility documentation
+
+## Starting Point
+- The configuration loader and prompt assembly modules have been implemented
+- Settings include API configuration like keys and endpoints
+- We need to implement the client following the provider pattern
+
+## Requirements
+- Create a base LLM provider interface
+- Implement the Claude provider
+- Create a provider factory
+- Implement the main LLM client class
+- Handle authentication and API communication
+- Provide proper error handling and retry logic
+- Follow the provider pattern from the extensibility design
+
+## Steps
+1. Create the base provider interface:
+   - Create `/src/api/providers/base.js` with the base provider class
+   - Define the generateResponse method that all providers must implement
+
+2. Implement the Claude provider:
+   - Create `/src/api/providers/claude.js` extending the base provider
+   - Implement constructor that accepts configuration
+   - Implement the generateResponse method using fetch/axios
+   - Handle Claude API specifics (headers, request format, response parsing)
+
+3. Create the provider factory:
+   - Create `/src/api/providers/factory.js` with the provider factory
+   - Implement getProvider method that returns the appropriate provider
+   - For MVP, only support the Claude provider
+
+4. Create the main LLM client:
+   - Create `/src/api/client.js` with the main client class
+   - Implement constructor that instantiates a provider
+   - Implement generateResponse method that delegates to the provider
+   - Add error handling and basic retry logic
+
+5. Implement error handling:
+   - Create custom error classes for API errors
+   - Handle common error scenarios (auth errors, rate limits, timeouts)
+   - Provide meaningful error messages
+
+## References
+- [DOC-DEV-IMPL-EXT-1]: Implementation Extensibility Guidelines
+- [DOC-TECH-API-1]: API Integration Architecture
+- [DOC-TECH-EXT-1]: Extensibility Design Patterns
+
+## Constraints
+- Never hardcode API keys in the code
+- Use environment variables or settings for sensitive information
+- Follow the provider pattern described in the extensibility document
+- Handle API errors gracefully
+- For MVP, only Claude provider needs to be fully implemented
+- The factory should support expanding to other providers in the future
+
+## Expected Output
+A fully functioning LLM API client with:
+- Clean API for generating responses
+- Provider pattern implementation
+- Claude API integration
+- Proper error handling
+- Basic retry logic
+- Extensibility for future LLM providers
+
+## Validation
+- Unit tests should verify:
+  - Provider factory returns correct provider
+  - Client correctly delegates to provider
+  - Error handling works as expected
+  - Integration tests should verify end-to-end communication
+  - Tests should mock actual API calls
+
+## Next Steps
+After implementing the LLM API client, we will create the unit tests for this module (TASK7) and then move on to implementing the Express server with API endpoints (TASK8).

@@ -1,0 +1,97 @@
+# IMPLEMENTATION TASK 10: Frontend User Interface
+
+## Context
+The VALUGATOR Probe Alpha project needs a minimal frontend user interface to allow users to submit startup ideas and receive feedback from gator personas. This UI will be served by our Express server and will interact with the server's API endpoints.
+
+## Objective
+Implement a minimal but functional frontend UI that:
+1. Allows users to select a gator persona
+2. Provides a form for submitting startup ideas
+3. Displays gator responses with appropriate styling
+4. Handles loading states and errors
+5. Provides a clean, usable interface
+
+## Starting Point
+- The Express server with API endpoints has been implemented
+- Static file serving is configured in the server
+- We need to create HTML, CSS, and JavaScript files for the frontend
+
+## Requirements
+- Create a simple, responsive HTML structure
+- Implement clean CSS styling
+- Create JavaScript for interacting with the API
+- Handle form submission and validation
+- Display gator responses
+- Show loading indicators
+- Implement error handling
+- Allow users to submit multiple ideas in sequence
+
+## Steps
+1. Create the HTML structure in `/src/public/index.html`:
+   - Create a header with the project title
+   - Implement a form with persona selection dropdown
+   - Add a textarea for startup idea input
+   - Create containers for response display
+   - Add loading indicator elements
+   - Include error message display
+
+2. Implement CSS styling in `/src/public/css/styles.css`:
+   - Create responsive layout
+   - Style form elements
+   - Implement response display styling
+   - Create loading indicator animation
+   - Style error messages
+   - Ensure mobile-friendly design
+
+3. Implement JavaScript in `/src/public/js/app.js`:
+   - Add event listeners for form submission
+   - Implement API calls to the server
+   - Create functions for displaying responses
+   - Implement loading state management
+   - Add error handling
+   - Create functions for resetting the form
+
+4. Add functionality to load available personas:
+   - Fetch personas from the `/api/personas` endpoint
+   - Populate the persona selection dropdown
+   - Handle errors in persona loading
+
+5. Implement form validation:
+   - Validate required fields
+   - Prevent submission of empty forms
+   - Show appropriate validation messages
+
+## References
+- [DOC-TECH-UI-1]: User Interface Specifications
+- [DOC-TECH-EXT-1]: Extensibility Design Patterns
+
+## Constraints
+- Keep the UI minimal and focused on functionality
+- Use vanilla JavaScript without frameworks for the MVP
+- Ensure responsive design for different screen sizes
+- Follow accessibility best practices
+- Keep the code clean and maintainable
+
+## Expected Output
+A fully functioning frontend UI with:
+- Clean, responsive HTML structure
+- Attractive CSS styling
+- JavaScript for API interaction
+- Form for submitting startup ideas
+- Persona selection dropdown
+- Response display area
+- Loading indicators
+- Error handling
+- Reset functionality
+
+## Validation
+- The UI should load correctly when served by the Express server
+- Persona dropdown should be populated with available gators
+- Form submission should work correctly
+- Responses should be displayed properly
+- Loading states should be indicated
+- Errors should be handled gracefully
+- UI should be responsive on different screen sizes
+
+## Next Steps
+After implementing the frontend UI, we will perform end-to-end testing (TASK11) to ensure all components work together correctly.

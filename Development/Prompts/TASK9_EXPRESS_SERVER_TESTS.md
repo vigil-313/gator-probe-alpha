@@ -1,0 +1,88 @@
+# IMPLEMENTATION TASK 9: Express Server Unit Tests
+
+## Context
+The Express server is the integration point for all components of the VALUGATOR Probe Alpha system. It provides API endpoints and serves static files. To ensure its reliability and correct functioning, we need comprehensive tests.
+
+## Objective
+Create a comprehensive test suite for the Express server that verifies API endpoints, middleware, error handling, and integration with other components.
+
+## Starting Point
+- The Express server has been implemented in TASK8
+- The project uses Jest for testing
+- Test files should be located in the `/tests/integration` directory
+- Supertest will be used for API testing
+
+## Requirements
+- Create comprehensive tests for the Express server
+- Test API endpoints
+- Test input validation
+- Test error handling
+- Test integration with other components
+- Use Supertest for API testing
+- Mock dependencies to isolate tests
+
+## Steps
+1. Create test file at `/tests/integration/server.test.js`
+
+2. Set up test environment:
+   - Import required modules (Express, Supertest, etc.)
+   - Mock dependencies (config loader, prompt assembler, LLM client)
+   - Configure the Express app for testing
+
+3. Test the `/api/generate` endpoint:
+   - Test successful response generation
+   - Test handling of invalid persona ID
+   - Test handling of missing user input
+   - Test handling of API errors
+
+4. Test the `/api/personas` endpoint:
+   - Test successful retrieval of personas
+   - Test handling of configuration errors
+
+5. Test middleware:
+   - Test input validation middleware
+   - Test error handling middleware
+   - Test static file serving
+
+6. Test integration with components:
+   - Test integration with config loader
+   - Test integration with prompt assembler
+   - Test integration with LLM client
+
+7. Test error scenarios:
+   - Test handling of validation errors
+   - Test handling of configuration errors
+   - Test handling of LLM API errors
+   - Test handling of unknown errors
+
+8. Ensure all tests are properly organized and documented
+
+## References
+- [DOC-DEV-IMPL-EXT-1]: Implementation Extensibility Guidelines
+- [DOC-TECH-API-1]: API Integration Architecture
+- [DOC-TECH-UI-1]: User Interface Specifications
+
+## Constraints
+- Use Jest and Supertest for API testing
+- Mock dependencies to isolate tests
+- Tests should run quickly and not depend on external resources
+- Follow Jest best practices for test organization
+
+## Expected Output
+A comprehensive test suite that:
+- Verifies all functionality of the Express server
+- Tests all API endpoints
+- Tests middleware
+- Tests error handling
+- Tests integration with other components
+- Provides good code coverage
+- Is well-organized and documented
+
+## Validation
+- All tests should pass
+- Tests should provide good coverage of the server code
+- Tests should verify both successful operations and error conditions
+- Tests should be readable and maintainable
+
+## Next Steps
+After ensuring the Express server is properly tested, we will implement the minimal frontend UI (TASK10) which will interact with the server API.
