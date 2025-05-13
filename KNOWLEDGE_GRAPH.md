@@ -78,6 +78,16 @@
   - Related: [CON-PROBE-002], [CON-PROBE-004], [CON-PROBE-005]
   - Documents: [DOC-TECH-EXT-1], [DOC-DEV-IMPL-EXT-1]
 
+- [CON-PROBE-012]: Project Structure
+  - Definition: Node.js-based implementation architecture with modular components and clear separation of concerns
+  - Related: [CON-PROBE-011], [CON-PROBE-013]
+  - Documents: [DOC-DEV-IMPL-1]
+
+- [CON-PROBE-013]: ES Modules Pattern
+  - Definition: Modern JavaScript module system used for better maintainability and future compatibility
+  - Related: [CON-PROBE-012]
+  - Documents: [DOC-DEV-IMPL-1]
+
 ## System Relationships
 1. [CON-SYS-001] → implements → [CON-SYS-002]
 2. [CON-SYS-001] → organizes by → [CON-SYS-003]
@@ -100,6 +110,9 @@
 13. [CON-PROBE-011] → structures → [CON-PROBE-002], [CON-PROBE-004], [CON-PROBE-005]
 14. [CON-PROBE-011] → enables → future enhancements
 15. [CON-PROBE-004] → implements → provider pattern
+16. [CON-PROBE-012] → implements → [CON-PROBE-013]
+17. [CON-PROBE-012] → organizes → all implementation modules
+18. [CON-PROBE-013] → enhances → maintainability and compatibility
 
 ## Visual Representation
 ### Documentation System
@@ -161,6 +174,45 @@ Documentation System
           └─────────────────┘
 ```
 
+### Project Structure
+```
+┌─ Node.js Project Structure ────────────────────────┐
+│ (CON-PROBE-012)                                    │
+│                                                    │
+│ ┌────────────────┐      ┌────────────────┐         │
+│ │  Configuration │      │ Express Server │         │
+│ │   - package.json     │   - server.js   │         │
+│ │   - .eslintrc.js     │   - middleware  │         │
+│ │   - jest.config.js   │   - routes      │         │
+│ └────────┬───────┘      └────────────────┘         │
+│          │                                         │
+│          ▼                                         │
+│ ┌─────────────────────────────────────────────┐    │
+│ │           Module Organization               │    │
+│ │                                             │    │
+│ │  ┌──────────┐ ┌──────────┐ ┌──────────┐     │    │
+│ │  │  Config  │ │  Prompt  │ │   API    │     │    │
+│ │  │  Module  │ │  Module  │ │  Client  │     │    │
+│ │  └──────────┘ └──────────┘ └──────────┘     │    │
+│ │                                             │    │
+│ │  ┌──────────┐ ┌──────────┐ ┌──────────┐     │    │
+│ │  │  Utils   │ │  Public  │ │  Tests   │     │    │
+│ │  │          │ │   UI     │ │          │     │    │
+│ │  └──────────┘ └──────────┘ └──────────┘     │    │
+│ └─────────────────────────────────────────────┘    │
+│                      │                             │
+│                      ▼                             │
+│ ┌─────────────────────────────────────────────┐    │
+│ │           ES Modules Pattern                │    │
+│ │           (CON-PROBE-013)                   │    │
+│ │  - type: "module" in package.json          │    │
+│ │  - import/export syntax                     │    │
+│ │  - Modern JavaScript practices              │    │
+│ └─────────────────────────────────────────────┘    │
+│                                                    │
+└────────────────────────────────────────────────────┘
+```
+
 ### Persona Configuration Structure
 ```
 ┌─ Gator Persona ────────────────────────────┐
@@ -217,4 +269,4 @@ Documentation System
 ```
 
 ## Last Updated
-2025-05-13T05:01:46Z | SESSION-005 | Claude
+2025-05-13T22:41:05Z | SESSION-006 | Claude

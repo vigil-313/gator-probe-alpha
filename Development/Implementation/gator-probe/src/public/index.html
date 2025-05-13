@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VALUGATOR Probe Alpha</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>VALUGATOR Probe Alpha</h1>
+      <p>Submit your startup idea for feedback from our AI gator personas</p>
+    </header>
+
+    <main>
+      <section class="persona-selector">
+        <h2>Select a Gator Persona</h2>
+        <div class="persona-options">
+          <!-- Persona options will be dynamically populated in future tasks -->
+          <select id="persona-select">
+            <option value="rex">Rex Revenue - The Business Expert</option>
+            <option value="tessa">Tessa Technical - The Tech Guru</option>
+            <option value="lex">Lex Legal - The Legal Advisor</option>
+          </select>
+        </div>
+      </section>
+
+      <section class="idea-submission">
+        <h2>Your Startup Idea</h2>
+        <form id="idea-form">
+          <textarea id="idea-input" rows="4" placeholder="Describe your startup idea..."></textarea>
+          <button type="submit" id="submit-button">Get Feedback</button>
+        </form>
+      </section>
+
+      <section class="response-area">
+        <h2>Gator Feedback</h2>
+        <div id="gator-response" class="response-box">
+          <p class="placeholder">Submit your idea to see feedback here</p>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <p>VALUGATOR Probe Alpha v0.1.0 | For demonstration purposes only</p>
+    </footer>
+  </div>
+
+  <script src="js/main.js"></script>
+</body>
+</html>
