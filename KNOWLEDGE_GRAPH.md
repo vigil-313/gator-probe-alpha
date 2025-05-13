@@ -39,9 +39,9 @@
   - Documents: [DOC-TECH-PERS-1]
 
 - [CON-PROBE-004]: LLM API Integration
-  - Definition: System for communicating with external AI service (Claude or GPT-4o)
-  - Related: [CON-PROBE-002], [CON-PROBE-005]
-  - Documents: [DOC-TECH-API-1]
+  - Definition: System for communicating with external AI service using provider pattern (Claude initially)
+  - Related: [CON-PROBE-002], [CON-PROBE-005], [CON-PROBE-011]
+  - Documents: [DOC-TECH-API-1], [DOC-TECH-EXT-1]
 
 - [CON-PROBE-005]: Minimal User Interface
   - Definition: Simple HTML form for pitch submission and response display
@@ -73,6 +73,11 @@
   - Related: [CON-PROBE-008], [CON-PROBE-009]
   - Documents: [DOC-GATOR-LAW-TRUTH-001]
 
+- [CON-PROBE-011]: Extensibility Design Pattern
+  - Definition: Architectural approach enabling future enhancements while maintaining minimal MVP implementation
+  - Related: [CON-PROBE-002], [CON-PROBE-004], [CON-PROBE-005]
+  - Documents: [DOC-TECH-EXT-1], [DOC-DEV-IMPL-EXT-1]
+
 ## System Relationships
 1. [CON-SYS-001] → implements → [CON-SYS-002]
 2. [CON-SYS-001] → organizes by → [CON-SYS-003]
@@ -92,6 +97,9 @@
 10. [CON-PROBE-008] → uses template → [CON-PROBE-009]
 11. [CON-PROBE-008] → constrained by → [CON-PROBE-010]
 12. [CON-PROBE-010] → informs → [CON-PROBE-009] for legal panel
+13. [CON-PROBE-011] → structures → [CON-PROBE-002], [CON-PROBE-004], [CON-PROBE-005]
+14. [CON-PROBE-011] → enables → future enhancements
+15. [CON-PROBE-004] → implements → provider pattern
 
 ## Visual Representation
 ### Documentation System
@@ -126,20 +134,27 @@ Documentation System
         │             └────────┬────────┘              └──────────────────────┘
         │                      │
         └──────────┬───────────┘
-                   ▼
+                   │                       ┌───────────────────────┐
+                   │    ┌──────────────────┤  Extensibility Design │
+                   │    │                  │  (CON-PROBE-011)      │
+                   ▼    ▼                  └───────────────────────┘
           ┌─────────────────┐
           │ PROMPT ASSEMBLY │
           │(CON-PROBE-002)  │
           └────────┬────────┘
                    │
-                   ▼
-          ┌─────────────────┐
+                   │                       ┌───────────────────────┐
+                   │    ┌──────────────────┤  Provider Pattern     │
+                   ▼    ▼                  │  (CON-PROBE-011)      │
+          ┌─────────────────┐              └───────────────────────┘
           │   LLM API       │
           │(CON-PROBE-004)  │
           └────────┬────────┘
                    │
-                   ▼
-          ┌─────────────────┐
+                   │                       ┌───────────────────────┐
+                   │    ┌──────────────────┤  Minimal Implementation│
+                   ▼    ▼                  │  (CON-PROBE-011)      │
+          ┌─────────────────┐              └───────────────────────┘
           │  USER INTERFACE │
           │ DISPLAYS RESULT │
           │(CON-PROBE-005)  │
@@ -202,4 +217,4 @@ Documentation System
 ```
 
 ## Last Updated
-2025-05-12 19:30:00 PDT | SESSION-003 | Claude
+2025-05-12T19:30:00-07:00 | SESSION-004 | Claude

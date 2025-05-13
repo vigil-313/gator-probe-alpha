@@ -4,105 +4,215 @@
 [DOC-TECH-API-1]
 
 ## Overview
-This document specifies the architecture for integrating with external LLM APIs (Claude or GPT-4o) to generate in-character gator responses. The API integration layer handles authentication, request formatting, error handling, and response processing.
+This document specifies how the VALUGATOR Probe Alpha integrates with external LLM APIs to generate gator persona responses. The API integration module follows a provider pattern to support different LLM services while maintaining a minimal, extensible implementation for the initial probe.
 
-## API Selection
-The probe supports integration with two leading LLM providers:
+## Provider Architecture
 
-1. **Anthropic Claude**
-   - Primary option
-   - Models: claude-3-sonnet-20240229, claude-3-opus-20240229, claude-3-haiku-20240307
-   - Endpoint: `https://api.anthropic.com/v1/messages`
+The API integration uses a provider pattern with these key components:
 
-2. **OpenAI GPT-4o** (alternative)
-   - Secondary option
-   - Models: gpt-4o-2024-05-13
-   - Endpoint: `https://api.openai.com/v1/chat/completions`
+```
+┌────────────────┐     ┌────────────────┐
+│  Prompt        │     │  Configuration │
+│  Assembler     │     │  Loader        │
+└────────┬───────┘     └────────┬───────┘
+         │                      │
+         └──────────┬───────────┘
+                    ▼
+           ┌──────────────────┐
+           │                  │
+           │   LLM Client     │
+           │                  │
+           └────────┬─────────┘
+                    │
+                    ▼
+         ┌───────────────────────┐
+         │                       │
+         │   Provider Factory    │
+         │                       │
+         └───────────┬───────────┘
+                     │
+                     ▼
+         ┌───────────────────────┐
+         │                       │
+         │   Claude Provider     │
+         │                       │
+         └───────────┬───────────┘
+                     │
+                     ▼
+         ┌───────────────────────┐
+         │                       │
+         │     Claude API        │
+         │                       │
+         └───────────────────────┘
+```
 
-The API selection is configured in `/config/settings.json` and can be changed without modifying code.
+## MVP Implementation Components
+
+### 1. Base Provider Interface
+
+```javascript
+// src/api/providers/base.js
+class BaseLlmProvider {
+  constructor(config) {
+    this.config = config;
+  }
+
+  async generateResponse(prompt) {
+    throw new Error('Method must be implemented by subclass');
+  }
+}
+
+module.exports = BaseLlmProvider;
+```
+
+### 2. Claude Provider Implementation
+
+```javascript
+// src/api/providers/claude.js
+const BaseLlmProvider = require('./base');
+
+class ClaudeProvider extends BaseLlmProvider {
+  constructor(config) {
+    super(config);
+    this.apiKey = config.apiKey;
+    this.baseUrl = config.baseUrl || 'https://api.anthropic.com/v1/messages';
+    this.model = config.model || 'claude-3-sonnet-20240229';
+  }
+
+  async generateResponse(prompt) {
+    try {
+      const response = await fetch(this.baseUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': this.apiKey,
+          'anthropic-version': '2023-06-01'
+        },
+        body: JSON.stringify({
+          model: this.model,
+          temperature: this.config.temperature || 0.7,
+          max_tokens: this.config.maxTokens || 1500,
+          messages: [
+            { role: 'system', content: prompt },
+            { role: 'user', content: 'Provide feedback on this startup idea' }
+          ]
+        })
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(`Claude API error: ${errorData.error?.message || response.statusText}`);
+      }
+
+      const data = await response.json();
+      return data.content[0].text;
+    } catch (error) {
+      console.error('Error calling Claude API:', error);
+      throw error;
+    }
+  }
+}
+
+module.exports = ClaudeProvider;
+```
+
+### 3. Provider Factory
+
+```javascript
+// src/api/providers/factory.js
+const ClaudeProvider = require('./claude');
+
+class LlmProviderFactory {
+  static getProvider(type, config) {
+    switch(type.toLowerCase()) {
+      case 'claude':
+        return new ClaudeProvider(config);
+      // Future providers would be added here
+      default:
+        throw new Error(`Unsupported provider type: ${type}`);
+    }
+  }
+}
+
+module.exports = LlmProviderFactory;
+```
+
+### 4. LLM Client
+
+```javascript
+// src/api/client.js
+const LlmProviderFactory = require('./providers/factory');
+
+class LlmClient {
+  constructor(providerType, config) {
+    this.provider = LlmProviderFactory.getProvider(providerType, config);
+  }
+
+  async generateResponse(prompt) {
+    try {
+      return await this.provider.generateResponse(prompt);
+    } catch (error) {
+      // Basic error handling for MVP
+      console.error('Error generating response:', error);
+      throw new Error('Failed to generate response from LLM service');
+    }
+  }
+}
+
+module.exports = LlmClient;
+```
 
 ## Authentication
 
-API keys must be securely managed:
+API keys are managed securely through environment variables:
 
-1. **Environment Variables**
-   - ANTHROPIC_API_KEY
-   - OPENAI_API_KEY
-
-2. **Environment File**
+1. **Environment File**
    - Create a `.env` file with API keys (gitignored)
-   - Load values using a library like `dotenv`
+   - Load using the dotenv package
 
 ```
-ANTHROPIC_API_KEY=sk-ant-xxxxx
-OPENAI_API_KEY=sk-xxxxx
+CLAUDE_API_KEY=your_api_key_here
 ```
 
-⚠️ **Important**: Never hardcode API keys in source files or commit them to version control.
+2. **Loading Environment Variables**
+
+```javascript
+// server.js
+require('dotenv').config();
+
+// Access in code
+const apiKey = process.env.CLAUDE_API_KEY;
+```
 
 ## Request Format
 
-### Anthropic Claude API
+The Claude API request format for the MVP:
 
 ```javascript
-// Claude request format
-const claudeRequest = {
-  model: "claude-3-sonnet-20240229",
-  temperature: 0.7,
-  max_tokens: 1500,
-  messages: [
+// Claude API request format
+{
+  "model": "claude-3-sonnet-20240229",
+  "temperature": 0.7,
+  "max_tokens": 1500,
+  "messages": [
     {
-      role: "system",
-      content: systemPrompt  // Assembled from persona config
+      "role": "system",
+      "content": "[System prompt with gator persona instructions]"
     },
     {
-      role: "user",
-      content: userInput     // User's startup idea
+      "role": "user",
+      "content": "Provide feedback on this startup idea"
     }
   ]
-};
-
-// Headers
-const claudeHeaders = {
-  "Content-Type": "application/json",
-  "x-api-key": process.env.ANTHROPIC_API_KEY,
-  "anthropic-version": "2023-06-01"
-};
+}
 ```
 
-### OpenAI GPT-4o API
+## Response Format
+
+The Claude API response and extraction:
 
 ```javascript
-// OpenAI request format
-const openaiRequest = {
-  model: "gpt-4o-2024-05-13",
-  temperature: 0.7,
-  max_tokens: 1500,
-  messages: [
-    {
-      role: "system",
-      content: systemPrompt  // Assembled from persona config
-    },
-    {
-      role: "user",
-      content: userInput     // User's startup idea
-    }
-  ]
-};
-
-// Headers
-const openaiHeaders = {
-  "Content-Type": "application/json",
-  "Authorization": `Bearer ${process.env.OPENAI_API_KEY}`
-};
-```
-
-## Response Processing
-
-The response from the API will be processed to extract the generated text:
-
-```javascript
-// Claude response format
+// Sample Claude API response structure
 {
   "id": "msg_0123456789ABCDEF",
   "type": "message",
@@ -120,168 +230,149 @@ The response from the API will be processed to extract the generated text:
     "output_tokens": 89
   }
 }
-```
 
-Extract the response text:
-
-```javascript
-// For Claude API
+// Response extraction
 const responseText = response.content[0].text;
-
-// For OpenAI API
-const responseText = response.choices[0].message.content;
 ```
 
-## Error Handling
+## Error Handling (MVP)
 
-The API integration layer will handle various types of errors:
+The MVP implementation includes basic error handling:
 
-1. **Network Errors**
-   - Connection failures
-   - Timeout issues
-   - Retry mechanism for transient failures
+1. **API Request Errors**
+   - Network issues
+   - Authentication failures
+   - Invalid responses
 
-2. **Authentication Errors**
-   - Invalid API keys
-   - Expired credentials
-   - Clear error messages for authentication issues
-
-3. **Rate Limit Errors**
-   - Respect rate limits from API providers
-   - Implement exponential backoff
-   - Queue requests when approaching limits
-
-4. **Malformed Responses**
-   - Handle unexpected response formats
-   - Provide fallback responses for critical failures
-
-## Response Validation
-
-To ensure character consistency, responses should be validated:
-
-1. **Tone Verification**
-   - Check response matches expected character voice
-   - Flag responses that seem out of character
-
-2. **Length Validation**
-   - Ensure responses are within expected length range
-   - Trim extremely long responses if necessary
-
-3. **Content Moderation**
-   - Handle potential content filter flags
-   - Provide fallback for rejected responses
-
-## Implementation Architecture
-
-```
-┌───────────────────┐     ┌────────────────────┐
-│ Prompt Assembler  │────►│ API Client Factory │
-└───────┬───────────┘     └─────────┬──────────┘
-        │                           │
-        │                           │
-┌───────▼───────────┐    ┌──────────▼─────────┐
-│ Request Builder   │◄───┤ Credential Manager │
-└───────┬───────────┘    └────────────────────┘
-        │
-        │
-┌───────▼───────────┐
-│ HTTP Client       │
-└───────┬───────────┘
-        │
-        │
-┌───────▼───────────┐
-│ Response Parser   │
-└───────┬───────────┘
-        │
-        │
-┌───────▼───────────┐
-│ Response Validator│
-└───────┬───────────┘
-        │
-        │
-┌───────▼───────────┐
-│ Result Handler    │
-└───────────────────┘
-```
-
-## Metrics and Logging
-
-For monitoring and improvement:
-
-1. **Request Logging**
-   - Timestamp
-   - Selected gator persona
-   - User input length
-   - Request ID (for tracking)
-
-2. **Response Metrics**
-   - Response time
-   - Token usage
-   - Response length
-   - Character consistency score
-
-3. **Error Tracking**
-   - Error type and frequency
-   - Failed requests
-   - Recovery attempts
-
-## Implementation Example (Pseudocode)
+2. **Simple Error Communication**
+   - Consistent error format
+   - Descriptive messages for debugging
+   - User-friendly messages for display
 
 ```javascript
-// API client implementation
-class LlmApiClient {
-  constructor(settings) {
-    this.provider = settings.provider; // 'claude' or 'openai'
-    this.model = settings.model;
-    this.apiKey = process.env[this.provider === 'claude' ? 'ANTHROPIC_API_KEY' : 'OPENAI_API_KEY'];
-    this.temperature = settings.temperature;
-    this.maxTokens = settings.maxTokens;
-  }
-
-  async generateResponse(systemPrompt, userInput) {
-    try {
-      const endpoint = this.getEndpoint();
-      const headers = this.getHeaders();
-      const payload = this.buildPayload(systemPrompt, userInput);
-      
-      const response = await fetch(endpoint, {
-        method: 'POST',
-        headers,
-        body: JSON.stringify(payload)
-      });
-      
-      if (!response.ok) {
-        throw new Error(`API error: ${response.status}`);
-      }
-      
-      const data = await response.json();
-      return this.extractResponseText(data);
-    } catch (error) {
-      console.error('Error generating response:', error);
-      return this.getFallbackResponse();
-    }
-  }
-
-  // Additional helper methods...
+// Basic error handling
+try {
+  const response = await provider.generateResponse(prompt);
+  return response;
+} catch (error) {
+  console.error('Error generating response:', error);
+  throw new Error('Failed to generate gator response. Please try again.');
 }
 ```
 
-## Security Considerations
+## Configuration
 
-1. **API Key Protection**
-   - Use environment variables 
-   - Avoid client-side exposure
-   - Implement key rotation practices
+API configuration using environment variables and settings.json:
 
-2. **Content Filtering**
-   - Sanitize user inputs
-   - Implement profanity/harmful content filtering
-   - Respect API provider's usage policies
+```javascript
+// Example settings.json structure
+{
+  "llm": {
+    "defaultProvider": "claude",
+    "providers": {
+      "claude": {
+        "model": "claude-3-sonnet-20240229",
+        "temperature": 0.7,
+        "maxTokens": 1500
+      }
+    }
+  }
+}
+```
 
-3. **Data Protection**
-   - Consider data retention policies
-   - Avoid logging sensitive information
-   - Be transparent about data usage
+## Extension Points
+
+The architecture supports these future extensions:
+
+### 1. Additional Providers
+
+Future versions can easily add new LLM providers by implementing the BaseLlmProvider interface:
+
+```javascript
+// Future implementation example
+class Gpt4oProvider extends BaseLlmProvider {
+  constructor(config) {
+    super(config);
+    this.apiKey = config.apiKey;
+    this.baseUrl = config.baseUrl || 'https://api.openai.com/v1/chat/completions';
+    this.model = config.model || 'gpt-4o';
+  }
+
+  async generateResponse(prompt) {
+    // Implementation for GPT-4o
+  }
+}
+```
+
+### 2. Enhanced Error Handling
+
+Future versions could implement:
+- Retry mechanisms for transient failures
+- Fallback providers when primary provider fails
+- Detailed error categorization and handling
+
+### 3. Response Processing Pipeline
+
+The architecture allows for future addition of:
+- Response validation for character consistency
+- Content filtering and moderation
+- Response formatting enhancements
+
+### 4. Performance Optimizations
+
+Future optimizations could include:
+- Response caching for similar prompts
+- Request batching
+- Token usage optimization
+
+## Integration with Express Server
+
+The LLM client will be integrated with the server:
+
+```javascript
+// server.js
+const express = require('express');
+const LlmClient = require('./src/api/client');
+const ConfigLoader = require('./src/config/loader');
+const PromptAssembler = require('./src/prompt/assembler');
+
+// Initialize components
+const configLoader = new ConfigLoader('/path/to/config');
+const promptAssembler = new PromptAssembler(configLoader);
+const settings = await configLoader.loadSettings();
+const llmClient = new LlmClient(settings.llm.defaultProvider, {
+  apiKey: process.env.CLAUDE_API_KEY,
+  ...settings.llm.providers[settings.llm.defaultProvider]
+});
+
+// API endpoint
+app.post('/api/generate', async (req, res) => {
+  try {
+    const { personaId, userInput } = req.body;
+    const prompt = await promptAssembler.assemblePrompt(personaId, userInput);
+    const response = await llmClient.generateResponse(prompt);
+    res.json({ success: true, response });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+```
+
+## Implementation Timeline
+
+For the MVP implementation:
+
+1. **Day 5: Core Provider Architecture**
+   - Set up provider base class
+   - Implement Claude provider
+   - Create provider factory
+
+2. **Day 6: Integration and Error Handling**
+   - Connect with prompt assembly
+   - Implement basic error handling
+   - Test with API
+
+Future enhancements are documented in `/Technical/EXTENSION_POINTS.md`.
 
 ## Last Updated
-2025-05-11 23:50:00 PDT | SESSION-INIT-001 | Claude
+2025-05-12T17:55:00-07:00 | SESSION-004 | Claude

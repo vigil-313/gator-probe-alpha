@@ -1,21 +1,23 @@
 # VALUGATOR Probe Alpha
 
 ## Purpose
-VALUGATOR Probe Alpha is a focused technical prototype to validate AI-powered "gator" characters responding to user-submitted pitches. This probe tests whether different gator personas can be convincingly simulated using external LLM APIs (Claude or GPT-4o).
+VALUGATOR Probe Alpha is a minimal viable prototype to validate AI-powered "gator" characters responding to user-submitted startup ideas. This probe tests whether different gator personas can be convincingly simulated using external LLM APIs while maintaining an extensible architecture for future development.
 
 The end-to-end user flow is purposefully minimal:
 1. User submits a startup idea via a simple form
-2. System loads the selected gator's configuration
-3. Backend assembles a prompt and sends it to the LLM API
-4. Character-consistent response is displayed to the user
+2. User selects a gator persona from the dropdown
+3. System loads the selected gator's configuration
+4. Backend assembles a prompt using panel-specific templates
+5. LLM API client sends the prompt to Claude
+6. Character-consistent response is displayed to the user
 
-The probe will deliver:
+The probe delivers:
 - Simple HTML/JS interface for idea submission
 - Complete gator persona configurations (29 personas across 3 panels)
 - Panel-specific prompt templates
-- Prompt assembly backend
-- API integration with LLM service
-- Basic response rendering
+- Extensible prompt assembly module
+- LLM API client with provider pattern
+- Minimal but functional UI
 
 ## Current Status
 - ✅ Created JSON schema for gator personas
@@ -24,9 +26,10 @@ The probe will deliver:
   - Pathfinder Council (9 personas): Zane, Luma, Bram, Ori, Echo, Vex, Nell, Sol, Dr. Vire
   - Legal Panel (7 personas): Lex, Clara, Rana, Gavin, Delphi, Isla, Morven
 - ✅ Created panel-specific prompt templates
-- ✅ Defined technical architecture and implementation plan
-- 🔄 Backend implementation in progress
-- 🔄 Frontend development in progress
+- ✅ Defined technical architecture with extensibility patterns
+- ✅ Created detailed implementation plan with 7-day timeline
+- ✅ Developed module designs with extension points
+- 🔜 Implementation phase starting (SESSION-005)
 
 ## Session Protocol
 This project uses a structured documentation system to maintain context across planning sessions:
@@ -61,11 +64,49 @@ If you experience context loss or need to resume a session after interruption:
 
 > **Note for Claude**: Always check the CLAUDE_MUST_READ_THIS_FIRST directory first for essential protocol instructions.
 
+## Architecture Overview
+
+```
+┌────────────────┐     ┌────────────────┐
+│  Prompt        │     │  Configuration │
+│  Assembler     │     │  Loader        │
+└────────┬───────┘     └────────┬───────┘
+         │                      │
+         └──────────┬───────────┘
+                    ▼
+           ┌──────────────────┐
+           │                  │
+           │   LLM Client     │
+           │                  │
+           └────────┬─────────┘
+                    │
+                    ▼
+         ┌───────────────────────┐
+         │                       │
+         │   Provider Factory    │
+         │                       │
+         └───────────┬───────────┘
+                     │
+                     ▼
+         ┌───────────────────────┐
+         │                       │
+         │   Claude Provider     │
+         │                       │
+         └───────────┬───────────┘
+                     │
+                     ▼
+         ┌───────────────────────┐
+         │                       │
+         │     Claude API        │
+         │                       │
+         └───────────────────────┘
+```
+
 ## Project Structure
 ```
 gator-probe-alpha/
 ├── config/                     # Configuration files
-│   ├── personas/               # Gator persona configurations
+│   ├── personas/               # Gator persona configurations (29 personas)
 │   │   ├── evaluation-chamber/ # Evaluation gator personas (13)
 │   │   ├── pathfinder-council/ # Pathfinder gator personas (9)
 │   │   └── legal-panel/        # Legal gator personas (7)
@@ -75,13 +116,35 @@ gator-probe-alpha/
 │   │   └── legal.json          # Template for legal analysis prompts
 │   └── settings.json           # Global application settings
 │
-├── src/                        # Application source code (implementation pending)
-└── Technical/                  # Technical documentation
-    ├── PERSONA_SCHEMA.md       # Schema for gator personas
-    ├── PROMPT_ASSEMBLY.md      # Prompt assembly architecture
-    ├── API_INTEGRATION.md      # LLM API integration specification
-    ├── USER_INTERFACE.md       # User interface design
-    └── PROJECT_STRUCTURE.md    # Project file organization
+├── src/                        # Application source code
+│   ├── config/                 # Configuration management
+│   │   ├── loader.js           # Configuration loader with extension points
+│   │   └── validator.js        # Basic schema validation
+│   ├── prompt/                 # Prompt assembly code
+│   │   ├── assembler.js        # Combines persona config with templates
+│   │   └── templates.js        # Template processing utilities
+│   ├── api/                    # API-related code
+│   │   ├── client.js           # LLM API client with provider abstraction
+│   │   ├── providers/          # Provider-specific implementations
+│   │   │   └── claude.js       # Claude provider implementation
+│   │   └── routes.js           # API endpoints
+│   └── public/                 # Static assets and client-side code
+│       ├── index.html          # Main HTML file with minimal interface
+│       ├── css/                # CSS stylesheets
+│       └── js/                 # Client-side JavaScript
+│
+├── Technical/                  # Technical documentation
+│   ├── PERSONA_SCHEMA.md       # Schema for gator personas
+│   ├── PROMPT_ASSEMBLY.md      # Prompt assembly architecture
+│   ├── API_INTEGRATION.md      # LLM API integration specification
+│   ├── USER_INTERFACE.md       # User interface design
+│   ├── PROJECT_STRUCTURE.md    # Project file organization
+│   └── EXTENSION_POINTS.md     # Documentation of future extension capabilities
+│
+└── Development/                # Development documentation
+    ├── IMPLEMENTATION_PLAN.md  # Implementation timeline and tasks
+    └── Implementation/         # Implementation details
+        └── EXTENSIBILITY.md    # Extensibility design patterns
 ```
 
 ## Audience
@@ -107,5 +170,29 @@ Multiple audience levels from executive overview to technical implementation.
 - [LVL-DEV-1]: [Development documentation](Development/)
 - [LVL-PROTO-1]: [Session protocol documentation](SESSION_PROTOCOL/)
 
+## Implementation Timeline
+
+The implementation follows a 7-day timeline:
+
+1. **Day 1-2: Configuration Module**
+   - Project scaffolding
+   - Configuration loader implementation
+   - Unit tests for configuration loading
+
+2. **Day 3-4: Prompt Assembly Module**
+   - Template processing implementation
+   - Persona attribute extraction
+   - Prompt assembly with extension points
+
+3. **Day 5-6: API Integration & Server**
+   - LLM API client with provider pattern
+   - Claude provider implementation
+   - Express server with API endpoints
+
+4. **Day 7: UI & End-to-End Integration**
+   - HTML form and response display
+   - CSS styling for readability
+   - End-to-end testing
+
 ## Last Updated
-2025-05-12 18:30:00 PDT | SESSION-002 | Claude
+2025-05-12T19:30:00-07:00 | SESSION-004 | Claude

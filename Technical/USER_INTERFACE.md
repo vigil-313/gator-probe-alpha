@@ -4,9 +4,9 @@
 [DOC-TECH-UI-1]
 
 ## Overview
-This document outlines the design for the minimal user interface of the VALUGATOR Probe Alpha. The UI focuses on simplicity and functionality, allowing users to submit startup ideas and receive character-consistent responses from the selected gator persona.
+This document outlines the design for the minimal user interface of the VALUGATOR Probe Alpha. Following the MVP approach recommended by Zane and the technical gators, the UI focuses on the essential components needed to test the core user flow: submitting a startup idea and receiving a gator persona response.
 
-## Interface Components
+## Core Interface Components
 
 ### 1. Input Form
 
@@ -28,17 +28,17 @@ This document outlines the design for the minimal user interface of the VALUGATO
 │ └──────────────┘                                   │
 │                                                    │
 │           ┌────────────────┐                       │
-│           │ Face the Gator │                       │
+│           │ Get Feedback   │                       │
 │           └────────────────┘                       │
 │                                                    │
 └────────────────────────────────────────────────────┘
 ```
 
 #### Components:
-- **Page Title**: "VALUGATOR Probe Alpha"
-- **Text Area**: Multi-line input field for the startup idea
-- **Gator Selector**: Dropdown to select from available gators (configurable)
-- **Submit Button**: "Face the Gator" to trigger evaluation
+- **Page Title**: Simple heading "VALUGATOR Probe Alpha"
+- **Text Area**: Multi-line input for the startup idea
+- **Gator Selector**: Dropdown to select from available gators
+- **Submit Button**: Clear call to action to get feedback
 
 ### 2. Response Display
 
@@ -72,11 +72,13 @@ This document outlines the design for the minimal user interface of the VALUGATO
 ```
 
 #### Components:
-- **Original Idea**: Display of the user's submitted startup idea
-- **Gator Response**: The character's evaluation in a styled text block
-- **Try Again Button**: Option to submit another idea or try with a different gator
+- **Original Idea**: Display of the submitted idea
+- **Gator Response**: Persona response with character attribution
+- **Reset Button**: Option to submit another idea
 
-## HTML Implementation (index.html)
+## Implementation
+
+### HTML Implementation (index.html)
 
 ```html
 <!DOCTYPE html>
@@ -89,320 +91,342 @@ This document outlines the design for the minimal user interface of the VALUGATO
 </head>
 <body>
     <div class="container">
-        <h1>VALUGATOR Probe Alpha</h1>
+        <header>
+            <h1>VALUGATOR Probe Alpha</h1>
+        </header>
         
-        <div id="input-form" class="panel">
-            <div class="form-group">
-                <label for="startup-idea">Enter your startup idea:</label>
-                <textarea id="startup-idea" rows="5" placeholder="Describe your startup idea here..."></textarea>
+        <main>
+            <form id="gator-form">
+                <div class="form-group">
+                    <label for="user-input">Enter your startup idea:</label>
+                    <textarea id="user-input" rows="5" placeholder="Describe your startup idea here..." required></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="persona-select">Select Gator:</label>
+                    <select id="persona-select" required>
+                        <option value="" disabled selected>Select a gator...</option>
+                        <!-- Will be populated dynamically -->
+                    </select>
+                </div>
+                
+                <button type="submit">Get Feedback</button>
+            </form>
+            
+            <div id="response-container" class="hidden">
+                <h2 id="response-header"></h2>
+                <div id="response-content"></div>
+                <button id="reset-button">Submit Another Idea</button>
             </div>
             
-            <div class="form-group">
-                <label for="gator-select">Select Gator:</label>
-                <select id="gator-select">
-                    <option value="rex" selected>Rex Revenue</option>
-                    <!-- Additional gators will be added here -->
-                </select>
+            <div id="loading-indicator" class="hidden">
+                <p>Getting feedback from your chosen gator...</p>
             </div>
             
-            <button id="submit-btn" class="primary-btn">Face the Gator</button>
-        </div>
-        
-        <div id="response-display" class="panel hidden">
-            <div class="user-idea">
-                <h3>Your idea:</h3>
-                <p id="idea-display"></p>
+            <div id="error-container" class="hidden">
+                <p id="error-message"></p>
+                <button id="error-reset-button">Try Again</button>
             </div>
-            
-            <div class="gator-response">
-                <h3 id="gator-name"></h3>
-                <p id="response-text"></p>
-            </div>
-            
-            <button id="try-again-btn" class="secondary-btn">Try Another</button>
-        </div>
+        </main>
         
-        <div id="loading" class="hidden">
-            <div class="spinner"></div>
-            <p>The Gator is thinking...</p>
-        </div>
-        
-        <div id="error-message" class="panel error hidden">
-            <p>Something went wrong. Please try again.</p>
-        </div>
+        <footer>
+            <p>VALUGATOR Probe Alpha | 2025</p>
+        </footer>
     </div>
-
+    
     <script src="js/app.js"></script>
 </body>
 </html>
 ```
 
-## JavaScript Implementation (app.js)
-
-```javascript
-// Pseudocode for basic functionality
-document.addEventListener('DOMContentLoaded', () => {
-    // Elements
-    const inputForm = document.getElementById('input-form');
-    const responseDisplay = document.getElementById('response-display');
-    const startupIdeaInput = document.getElementById('startup-idea');
-    const gatorSelect = document.getElementById('gator-select');
-    const submitBtn = document.getElementById('submit-btn');
-    const ideaDisplay = document.getElementById('idea-display');
-    const gatorName = document.getElementById('gator-name');
-    const responseText = document.getElementById('response-text');
-    const tryAgainBtn = document.getElementById('try-again-btn');
-    const loading = document.getElementById('loading');
-    const errorMessage = document.getElementById('error-message');
-    
-    // Event listeners
-    submitBtn.addEventListener('click', handleSubmit);
-    tryAgainBtn.addEventListener('click', resetForm);
-    
-    // Load available gators
-    loadGators();
-    
-    async function loadGators() {
-        // In a full implementation, this would load from the server
-        // For the probe, we'll hardcode Rex Revenue
-    }
-    
-    async function handleSubmit() {
-        const idea = startupIdeaInput.value.trim();
-        const gator = gatorSelect.value;
-        
-        if (!idea) {
-            alert('Please enter your startup idea');
-            return;
-        }
-        
-        // Show loading state
-        inputForm.classList.add('hidden');
-        loading.classList.remove('hidden');
-        
-        try {
-            // Call API to get gator response
-            const response = await getGatorResponse(idea, gator);
-            
-            // Display response
-            ideaDisplay.textContent = idea;
-            gatorName.textContent = response.gatorDisplayName;
-            responseText.textContent = response.text;
-            
-            // Show response panel
-            loading.classList.add('hidden');
-            responseDisplay.classList.remove('hidden');
-        } catch (error) {
-            console.error('Error:', error);
-            loading.classList.add('hidden');
-            errorMessage.classList.remove('hidden');
-        }
-    }
-    
-    function resetForm() {
-        // Reset the form for another submission
-        responseDisplay.classList.add('hidden');
-        errorMessage.classList.add('hidden');
-        inputForm.classList.remove('hidden');
-        startupIdeaInput.value = '';
-    }
-    
-    async function getGatorResponse(idea, gator) {
-        // This would be an API call in the full implementation
-        // For the probe, we'll use fetch to call our backend
-        
-        const response = await fetch('/api/evaluate', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                gator,
-                userInput: idea
-            })
-        });
-        
-        if (!response.ok) {
-            throw new Error('API request failed');
-        }
-        
-        return await response.json();
-    }
-});
-```
-
-## CSS Styling (styles.css)
+### CSS Implementation (styles.css)
 
 ```css
-/* Basic styling for the probe interface */
+/* Minimal styling for the probe interface */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
 body {
-    font-family: Arial, sans-serif;
-    line-height: 1.6;
-    margin: 0;
-    padding: 20px;
-    background-color: #f5f5f5;
+  font-family: Arial, sans-serif;
+  line-height: 1.6;
+  color: #333;
+  background-color: #f4f4f4;
 }
 
 .container {
-    max-width: 800px;
-    margin: 0 auto;
-    background-color: white;
-    border-radius: 8px;
-    padding: 20px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
 }
 
-h1 {
-    text-align: center;
-    margin-bottom: 20px;
-    color: #333;
-}
-
-.panel {
-    margin-bottom: 20px;
-    padding: 15px;
-    border-radius: 4px;
+header {
+  margin-bottom: 30px;
+  text-align: center;
 }
 
 .form-group {
-    margin-bottom: 15px;
+  margin-bottom: 20px;
 }
 
 label {
-    display: block;
-    margin-bottom: 5px;
-    font-weight: bold;
+  display: block;
+  margin-bottom: 5px;
+  font-weight: bold;
 }
 
-textarea, select {
-    width: 100%;
-    padding: 8px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    font-size: 14px;
+select, textarea {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
 }
 
-.primary-btn, .secondary-btn {
-    display: block;
-    margin: 20px auto;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 4px;
-    font-size: 16px;
-    cursor: pointer;
+button {
+  display: inline-block;
+  padding: 10px 20px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
 }
 
-.primary-btn {
-    background-color: #4CAF50;
-    color: white;
+button:hover {
+  background-color: #45a049;
 }
 
-.secondary-btn {
-    background-color: #f0f0f0;
-    color: #333;
+#response-container {
+  margin-top: 30px;
+  padding: 20px;
+  background-color: #fff;
+  border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
-.gator-response {
-    background-color: #f0f8ff;
-    padding: 15px;
-    border-radius: 4px;
-    border-left: 4px solid #4CAF50;
-    margin-top: 15px;
+#response-header {
+  margin-bottom: 15px;
+  color: #2c3e50;
+}
+
+#response-content {
+  margin-bottom: 20px;
+  white-space: pre-line;
+}
+
+#reset-button {
+  margin-top: 20px;
+}
+
+#loading-indicator {
+  text-align: center;
+  margin: 30px 0;
+}
+
+#error-container {
+  margin-top: 20px;
+  padding: 15px;
+  background-color: #f8d7da;
+  color: #721c24;
+  border-radius: 4px;
 }
 
 .hidden {
-    display: none;
+  display: none;
 }
 
-.error {
-    background-color: #ffebee;
-    color: #d32f2f;
-    padding: 10px;
-    border-radius: 4px;
-}
-
-.spinner {
-    border: 4px solid #f3f3f3;
-    border-top: 4px solid #3498db;
-    border-radius: 50%;
-    width: 30px;
-    height: 30px;
-    animation: spin 2s linear infinite;
-    margin: 20px auto;
-}
-
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+footer {
+  margin-top: 50px;
+  text-align: center;
+  color: #777;
 }
 ```
 
-## Backend API Endpoint (pseudocode)
+### JavaScript Implementation (app.js)
 
 ```javascript
-// Express route handler (server.js)
-app.post('/api/evaluate', async (req, res) => {
-  try {
-    const { gator, userInput } = req.body;
+document.addEventListener('DOMContentLoaded', function() {
+  // Get DOM elements
+  const form = document.getElementById('gator-form');
+  const personaSelect = document.getElementById('persona-select');
+  const userInput = document.getElementById('user-input');
+  const responseContainer = document.getElementById('response-container');
+  const responseHeader = document.getElementById('response-header');
+  const responseContent = document.getElementById('response-content');
+  const resetButton = document.getElementById('reset-button');
+  const loadingIndicator = document.getElementById('loading-indicator');
+  const errorContainer = document.getElementById('error-container');
+  const errorMessage = document.getElementById('error-message');
+  const errorResetButton = document.getElementById('error-reset-button');
+  
+  // Load available personas
+  fetchPersonas();
+  
+  // Event listeners
+  form.addEventListener('submit', handleSubmit);
+  resetButton.addEventListener('click', resetForm);
+  errorResetButton.addEventListener('click', resetForm);
+  
+  // Functions
+  async function fetchPersonas() {
+    try {
+      const response = await fetch('/api/personas');
+      const data = await response.json();
+      
+      if (!data.success) {
+        throw new Error(data.message || 'Failed to load personas');
+      }
+      
+      // Populate select dropdown
+      data.personas.forEach(persona => {
+        const option = document.createElement('option');
+        option.value = persona.id;
+        option.textContent = `${persona.name} (${persona.panel})`;
+        personaSelect.appendChild(option);
+      });
+    } catch (error) {
+      showError('Failed to load gator personas. Please refresh the page.');
+      console.error('Error fetching personas:', error);
+    }
+  }
+  
+  async function handleSubmit(event) {
+    event.preventDefault();
     
-    // Load gator configuration
-    const gatorConfig = await loadGatorConfig(gator);
+    // Basic validation
+    if (!personaSelect.value) {
+      showError('Please select a gator persona');
+      return;
+    }
     
-    // Load prompt template
-    const promptTemplate = await loadPromptTemplate('evaluation');
+    if (!userInput.value.trim()) {
+      showError('Please enter your startup idea');
+      return;
+    }
     
-    // Assemble prompt
-    const systemPrompt = assemblePrompt(promptTemplate, gatorConfig);
+    // Show loading indicator
+    form.classList.add('hidden');
+    loadingIndicator.classList.remove('hidden');
     
-    // Call LLM API
-    const llmClient = createLlmClient();
-    const response = await llmClient.generateResponse(systemPrompt, userInput);
-    
-    // Return response
-    res.json({
-      gatorDisplayName: `${gatorConfig.name} "${gatorConfig.nickname}"`,
-      text: response
-    });
-  } catch (error) {
-    console.error('Error processing request:', error);
-    res.status(500).json({ error: 'Failed to generate response' });
+    try {
+      const response = await fetch('/api/generate', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          personaId: personaSelect.value,
+          userInput: userInput.value
+        })
+      });
+      
+      const data = await response.json();
+      
+      if (!response.ok || !data.success) {
+        throw new Error(data.message || 'Failed to generate response');
+      }
+      
+      // Display response
+      responseHeader.textContent = `Feedback from ${data.personaName}`;
+      responseContent.innerHTML = `<p>${data.response}</p>`;
+      
+      // Show response container, hide loading
+      loadingIndicator.classList.add('hidden');
+      responseContainer.classList.remove('hidden');
+    } catch (error) {
+      showError(error.message || 'An error occurred while getting feedback');
+      console.error('Error generating response:', error);
+      loadingIndicator.classList.add('hidden');
+    }
+  }
+  
+  function resetForm() {
+    // Reset form
+    form.reset();
+    form.classList.remove('hidden');
+    responseContainer.classList.add('hidden');
+    errorContainer.classList.add('hidden');
+  }
+  
+  function showError(message) {
+    errorMessage.textContent = message;
+    errorContainer.classList.remove('hidden');
   }
 });
 ```
 
-## Accessibility Considerations
+## API Integration
 
-1. **Keyboard Navigation**
-   - All interactive elements must be accessible via keyboard
-   - Proper tab order implemented
-   - Focus states clearly visible
+The UI interacts with two main backend API endpoints:
 
-2. **Screen Reader Support**
-   - Semantic HTML elements with appropriate ARIA attributes
-   - Meaningful alt text for any visual elements
-   - Screen reader announcements for dynamic content
+### 1. GET /api/personas
 
-3. **Responsive Design**
-   - Interface works across different screen sizes
-   - Text remains readable at different zoom levels
-   - Touch targets large enough for mobile devices
+Retrieves available gator personas:
 
-## Performance Considerations
+```javascript
+// Response format
+{
+  "success": true,
+  "personas": [
+    { "id": "rex", "name": "Rex Revenue", "panel": "Evaluation" },
+    { "id": "vanessa", "name": "Vanessa Venture", "panel": "Evaluation" },
+    { "id": "zane", "name": "Zane Cutter", "panel": "Pathfinder" },
+    { "id": "lex", "name": "Lex Talionis", "panel": "Legal" }
+  ]
+}
+```
 
-1. **Minimal Dependencies**
-   - No heavy frameworks required
-   - Limited use of external libraries
-   - Focus on vanilla JavaScript for core functionality
+### 2. POST /api/generate
 
-2. **Optimized Loading**
-   - CSS and JavaScript minification in production
-   - Asynchronous loading where appropriate
-   - Minimal asset sizes
+Generates a gator response:
 
-3. **Response Handling**
-   - Clear loading indicators during API calls
-   - Graceful error handling
-   - Response caching where appropriate
+```javascript
+// Request format
+{
+  "personaId": "rex",
+  "userInput": "An AI-powered app that writes breakup texts"
+}
+
+// Response format
+{
+  "success": true,
+  "personaName": "Rex \"The Roaster\" Revenue",
+  "response": "Look, I'll be blunt. Your app for AI-written breakup texts..."
+}
+```
+
+## Extension Points
+
+The UI is designed with these extension points for future development:
+
+### 1. Enhanced Visual Design
+- Gator persona avatars/images
+- Custom styling per gator type
+- More engaging visual elements
+
+### 2. User Experience Enhancements
+- Feedback collection mechanism
+- History of previous submissions
+- Panel-specific UI adaptations
+
+### 3. Multi-turn Conversations
+- Chat-like interface for follow-up questions
+- Conversation history display
+- Context preservation between exchanges
+
+These extensions are documented in more detail in `/Technical/EXTENSION_POINTS.md`.
+
+## Implementation Focus
+
+For the MVP, implementation will focus on:
+1. Basic form submission and response display
+2. Minimal styling for readability
+3. Core error handling
+4. API integration
+
+This minimal approach allows us to quickly test the core user flow while establishing a foundation that can be enhanced in future iterations.
 
 ## Last Updated
-2025-05-11 23:50:00 PDT | SESSION-INIT-001 | Claude
+2025-05-12T18:00:00-07:00 | SESSION-004 | Claude
