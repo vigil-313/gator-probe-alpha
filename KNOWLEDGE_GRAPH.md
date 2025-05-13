@@ -40,7 +40,7 @@
 
 - [CON-PROBE-004]: LLM API Integration
   - Definition: System for communicating with external AI service using provider pattern (Claude initially)
-  - Related: [CON-PROBE-002], [CON-PROBE-005], [CON-PROBE-011]
+  - Related: [CON-PROBE-002], [CON-PROBE-005], [CON-PROBE-011], [CON-PROBE-020], [CON-PROBE-021]
   - Documents: [DOC-TECH-API-1], [DOC-TECH-EXT-1]
 
 - [CON-PROBE-005]: Minimal User Interface
@@ -75,7 +75,7 @@
 
 - [CON-PROBE-011]: Extensibility Design Pattern
   - Definition: Architectural approach enabling future enhancements while maintaining minimal MVP implementation
-  - Related: [CON-PROBE-002], [CON-PROBE-004], [CON-PROBE-005]
+  - Related: [CON-PROBE-002], [CON-PROBE-004], [CON-PROBE-005], [CON-PROBE-020]
   - Documents: [DOC-TECH-EXT-1], [DOC-DEV-IMPL-EXT-1]
 
 - [CON-PROBE-012]: Project Structure
@@ -105,7 +105,7 @@
 
 - [CON-PROBE-017]: PromptError Handling System
   - Definition: Structured error handling approach with specific error codes, detailed messages, and error propagation
-  - Related: [CON-PROBE-002], [CON-PROBE-016], [CON-PROBE-018]
+  - Related: [CON-PROBE-002], [CON-PROBE-016], [CON-PROBE-018], [CON-PROBE-022]
   - Documents: [DOC-TECH-PROM-1]
 
 - [CON-PROBE-018]: Test Isolation Pattern
@@ -115,7 +115,27 @@
 
 - [CON-PROBE-019]: Error Code Validation System
   - Definition: Testing strategy for verifying error types, codes and propagation in component interactions
-  - Related: [CON-PROBE-017], [CON-PROBE-018]
+  - Related: [CON-PROBE-017], [CON-PROBE-018], [CON-PROBE-022]
+  - Documents: [DOC-DEV-TEST-1]
+
+- [CON-PROBE-020]: Provider Pattern Implementation
+  - Definition: Design pattern that abstracts LLM API interactions through a common interface with provider-specific implementations
+  - Related: [CON-PROBE-004], [CON-PROBE-011], [CON-PROBE-021]
+  - Documents: [DOC-TECH-API-1], [DOC-DEV-IMPL-EXT-1]
+
+- [CON-PROBE-021]: API Client Retry Mechanism
+  - Definition: System for handling transient API failures with exponential backoff and categorized error retries
+  - Related: [CON-PROBE-004], [CON-PROBE-020], [CON-PROBE-022]
+  - Documents: [DOC-TECH-API-1]
+
+- [CON-PROBE-022]: ApiError Handling System
+  - Definition: Structured API error handling approach with specific error codes, status mapping, and error propagation
+  - Related: [CON-PROBE-017], [CON-PROBE-019], [CON-PROBE-021]
+  - Documents: [DOC-TECH-API-1]
+
+- [CON-PROBE-023]: LLM API Client Test Strategy
+  - Definition: Comprehensive test suite for API client with component isolation, retry verification, and error handling validation
+  - Related: [CON-PROBE-014], [CON-PROBE-018], [CON-PROBE-020], [CON-PROBE-021]
   - Documents: [DOC-DEV-TEST-1]
 
 ## System Relationships
@@ -139,7 +159,7 @@
 12. [CON-PROBE-010] → informs → [CON-PROBE-009] for legal panel
 13. [CON-PROBE-011] → structures → [CON-PROBE-002], [CON-PROBE-004], [CON-PROBE-005]
 14. [CON-PROBE-011] → enables → future enhancements
-15. [CON-PROBE-004] → implements → provider pattern
+15. [CON-PROBE-004] → implements → [CON-PROBE-020]
 16. [CON-PROBE-012] → implements → [CON-PROBE-013]
 17. [CON-PROBE-012] → organizes → all implementation modules
 18. [CON-PROBE-013] → enhances → maintainability and compatibility
@@ -148,12 +168,17 @@
 21. [CON-PROBE-015] → ensures → code reliability
 22. [CON-PROBE-016] → powers → [CON-PROBE-002]
 23. [CON-PROBE-016] → processes → [CON-PROBE-009] templates
-24. [CON-PROBE-017] → enhances → robustness of [CON-PROBE-002]
-25. [CON-PROBE-017] → provides → structured error feedback
-26. [CON-PROBE-018] → enables → thorough unit testing
-27. [CON-PROBE-018] → implements → [CON-PROBE-014] for test isolation
-28. [CON-PROBE-019] → validates → [CON-PROBE-017] error handling
-29. [CON-PROBE-019] → enhances → code reliability
+24. [CON-PROBE-017] → provides → structured error handling
+25. [CON-PROBE-018] → enables → thorough unit testing
+26. [CON-PROBE-019] → validates → error handling systems
+27. [CON-PROBE-020] → abstracts → LLM provider differences
+28. [CON-PROBE-020] → enables → multi-provider support
+29. [CON-PROBE-021] → improves → API interaction reliability
+30. [CON-PROBE-021] → implements → exponential backoff
+31. [CON-PROBE-022] → categorizes → API errors by type
+32. [CON-PROBE-022] → extends → [CON-PROBE-017] approach for APIs
+33. [CON-PROBE-023] → verifies → [CON-PROBE-020], [CON-PROBE-021], [CON-PROBE-022]
+34. [CON-PROBE-023] → applies → [CON-PROBE-014], [CON-PROBE-018] for API testing
 
 ## Visual Representation
 ### Documentation System
@@ -199,11 +224,14 @@ Documentation System
                    │
                    │                       ┌───────────────────────┐
                    │    ┌──────────────────┤  Provider Pattern     │
-                   ▼    ▼                  │  (CON-PROBE-011)      │
+                   ▼    ▼                  │  (CON-PROBE-020)      │
           ┌─────────────────┐              └───────────────────────┘
           │   LLM API       │
-          │(CON-PROBE-004)  │
-          └────────┬────────┘
+          │(CON-PROBE-004)  │◄─────┐
+          └────────┬────────┘      │       ┌───────────────────────┐
+                   │               └───────┤  Retry Mechanism      │
+                   │                       │  (CON-PROBE-021)      │
+                   │                       └───────────────────────┘
                    │
                    │                       ┌───────────────────────┐
                    │    ┌──────────────────┤  Minimal Implementation│
@@ -309,5 +337,44 @@ Documentation System
 └────────────────────────────────────────────────────┘
 ```
 
+### LLM API Client Architecture
+```
+┌─ LLM API Client Architecture ──────────────────────┐
+│                                                    │
+│ ┌────────────────┐      ┌────────────────────────┐ │
+│ │ LLM Client     │      │ Provider Factory       │ │
+│ │ - Config mgmt  │◄────►│ - Provider creation    │ │
+│ │ - Retry logic  │      │ - Provider selection   │ │
+│ │ - Error handling      │ - Factory pattern      │ │
+│ └────────┬───────┘      └────────────┬───────────┘ │
+│          │                           │             │
+│          │          ┌────────────────▼───────────┐ │
+│          │          │ BaseProvider Interface     │ │
+│          │          │ - generateResponse()       │ │
+│          │          │ - validateConfig()         │ │
+│          │          └────────────────┬───────────┘ │
+│          │                           │             │
+│          │                           │             │
+│          │         ┌────────────┬────┴─────┐       │
+│          │         │            │          │       │
+│          │   ┌─────▼──────┐ ┌───▼────┐  ┌──▼────┐  │
+│          │   │  Claude    │ │  GPT   │  │ Future│  │
+│          │   │  Provider  │ │Provider│  │Provide│  │
+│          │   └─────┬──────┘ └────────┘  └───────┘  │
+│          │         │                               │
+│          │         │                               │
+│          └─────────┘                               │
+│                                                    │
+│ ┌──────────────────────────────────────────────┐   │
+│ │          ApiError System                      │   │
+│ │ - Error codes for different failure types     │   │
+│ │ - Structured error information                │   │
+│ │ - HTTP status code mapping                    │   │
+│ │ - Error categorization for retry decisions    │   │
+│ └──────────────────────────────────────────────┘   │
+│                                                    │
+└────────────────────────────────────────────────────┘
+```
+
 ## Last Updated
-2025-05-15T11:30:00Z | SESSION-008 | Claude
+2025-05-13T01:30:00Z | SESSION-010 | Claude

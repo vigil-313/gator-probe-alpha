@@ -1,0 +1,103 @@
+# Claude Code Implementation Session
+
+This file contains the prompt to be used with claude.ai/code for implementing this specific task.
+Copy the entire content between the START PROMPT and END PROMPT markers into Claude Code.
+
+-------------------START PROMPT-------------------
+# IMPLEMENTATION TASK 7: LLM API Client Unit Tests
+
+## Context
+The LLM API client module is responsible for communicating with language model services following the provider pattern. To ensure its reliability and correct implementation of the provider pattern, we need comprehensive unit tests.
+
+## Objective
+Create a comprehensive test suite for the LLM API client module that verifies the provider pattern implementation, API communication, error handling, and retry logic.
+
+## Starting Point
+- The LLM API client module has been implemented in TASK6
+- The project uses Jest for testing
+- Test files should be located in the `/tests/api` directory
+
+## Requirements
+- Create comprehensive unit tests for the LLM API client
+- Test the provider pattern implementation
+- Test the Claude provider implementation
+- Mock external API calls
+- Test error handling and retry logic
+- Ensure all public methods are tested
+
+## Steps
+1. Create test files:
+   - `/tests/api/client.test.js` for the main client
+   - `/tests/api/providers/factory.test.js` for the provider factory
+   - `/tests/api/providers/claude.test.js` for the Claude provider
+
+2. Test client functionality:
+   - Test client initialization with different providers
+   - Test that client correctly delegates to provider
+   - Test error handling at the client level
+   - Test retry logic
+
+3. Test provider factory:
+   - Test factory returns correct provider based on type
+   - Test factory behavior with unknown provider types
+   - Test factory error handling
+
+4. Test Claude provider:
+   - Mock fetch/axios for API calls
+   - Test request formatting
+   - Test response parsing
+   - Test authentication handling
+   - Test error handling
+
+5. Test error scenarios:
+   - Test behavior with authentication errors
+   - Test behavior with rate limiting
+   - Test behavior with timeout errors
+   - Test behavior with malformed responses
+
+6. Test retry logic:
+   - Test retries on specific error types
+   - Test maximum retry limit
+   - Test backoff strategy if implemented
+
+7. Ensure all tests are properly organized and documented
+
+## References
+- [DOC-DEV-IMPL-EXT-1]: Implementation Extensibility Guidelines
+- [DOC-TECH-API-1]: API Integration Architecture
+- [DOC-TECH-EXT-1]: Extensibility Design Patterns
+
+## Constraints
+- Never include actual API keys in tests
+- Use Jest's mocking capabilities for external services
+- Tests should run quickly and not depend on external resources
+- Follow Jest best practices for test organization
+
+## Expected Output
+A comprehensive test suite that:
+- Verifies all functionality of the LLM API client
+- Tests the provider pattern implementation
+- Tests the Claude provider specifically
+- Provides good code coverage
+- Includes tests for edge cases and error conditions
+- Is well-organized and documented
+
+## Validation
+- All tests should pass
+- Tests should provide good coverage of the API client module
+- Tests should verify both successful operations and error conditions
+- Tests should be readable and maintainable
+
+## Next Steps
+After ensuring the LLM API client is properly tested, we will implement the Express server with API endpoints (TASK8) which will integrate all the components we've built so far.
+-------------------END PROMPT-------------------
+
+## After Implementation
+
+Once Claude Code has completed this implementation task:
+
+1. Save all generated code to the appropriate locations in Development/Implementation/
+2. Update the session state and development documentation
+3. Mark the implementation task as complete in the Implementation Plan
+4. Ensure all files are in their proper directories according to VISTA structure
+5. Prepare for the next implementation task

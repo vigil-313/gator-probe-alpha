@@ -2,9 +2,19 @@
  * Tests for utility functions
  */
 
+import { jest } from '@jest/globals';
 import { safeJsonParse, createError, validateRequiredFields } from '../../src/utils/index.js';
 
 describe('Utility Functions', () => {
+  // Silence console.error during tests
+  beforeEach(() => {
+    jest.spyOn(console, 'error').mockImplementation(() => {});
+  });
+  
+  afterEach(() => {
+    jest.restoreAllMocks();
+  });
+  
   describe('safeJsonParse', () => {
     test('parses valid JSON correctly', () => {
       const jsonString = '{"key": "value"}';
