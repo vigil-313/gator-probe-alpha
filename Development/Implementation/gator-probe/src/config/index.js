@@ -1,17 +1,18 @@
 /**
  * Configuration Loader Module
- * Responsible for loading and validating gator persona configurations
- * Will be fully implemented in TASK2
+ * Responsible for loading and validating:
+ * - Gator persona configurations
+ * - Prompt templates
+ * - Global settings
  */
 
-export const configLoader = {
-  loadConfig: async (personaId) => {
-    // Placeholder for TASK2 implementation
-    return { id: personaId, name: "Placeholder Persona" };
-  },
-  
-  validateConfig: (config) => {
-    // Placeholder for TASK2 implementation
-    return config && config.id ? true : false;
-  }
-};
+import configLoader, { ConfigLoader, ConfigError } from './loader.js';
+
+// Export the main config loader instance
+export { configLoader };
+
+// Export the classes for external use
+export { ConfigLoader, ConfigError };
+
+// Default export for compatibility
+export default configLoader;

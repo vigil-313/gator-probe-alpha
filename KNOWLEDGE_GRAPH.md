@@ -85,8 +85,18 @@
 
 - [CON-PROBE-013]: ES Modules Pattern
   - Definition: Modern JavaScript module system used for better maintainability and future compatibility
-  - Related: [CON-PROBE-012]
+  - Related: [CON-PROBE-012], [CON-PROBE-014]
   - Documents: [DOC-DEV-IMPL-1]
+
+- [CON-PROBE-014]: Test Mocking Strategy
+  - Definition: Approach for isolating components during testing by replacing dependencies with controlled implementations
+  - Related: [CON-PROBE-013], [CON-PROBE-015]
+  - Documents: [DOC-DEV-TEST-1]
+
+- [CON-PROBE-015]: Jest Testing Framework
+  - Definition: JavaScript testing system used for unit and integration tests with support for mocking and assertions
+  - Related: [CON-PROBE-014]
+  - Documents: [DOC-DEV-TEST-1]
 
 ## System Relationships
 1. [CON-SYS-001] → implements → [CON-SYS-002]
@@ -113,6 +123,9 @@
 16. [CON-PROBE-012] → implements → [CON-PROBE-013]
 17. [CON-PROBE-012] → organizes → all implementation modules
 18. [CON-PROBE-013] → enhances → maintainability and compatibility
+19. [CON-PROBE-014] → supports → unit testing isolation
+20. [CON-PROBE-015] → implements → [CON-PROBE-014]
+21. [CON-PROBE-015] → ensures → code reliability
 
 ## Visual Representation
 ### Documentation System
@@ -269,4 +282,4 @@ Documentation System
 ```
 
 ## Last Updated
-2025-05-13T22:41:05Z | SESSION-006 | Claude
+2025-05-14T13:50:00Z | SESSION-007 | Claude
