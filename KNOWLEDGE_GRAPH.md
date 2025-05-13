@@ -30,7 +30,7 @@
 
 - [CON-PROBE-002]: Prompt Assembly
   - Definition: System for combining persona configuration with user input to create effective prompts
-  - Related: [CON-PROBE-001], [CON-PROBE-004], [CON-PROBE-009]
+  - Related: [CON-PROBE-001], [CON-PROBE-004], [CON-PROBE-009], [CON-PROBE-016], [CON-PROBE-017]
   - Documents: [DOC-TECH-PROM-1]
 
 - [CON-PROBE-003]: Persona Configuration Format
@@ -98,6 +98,26 @@
   - Related: [CON-PROBE-014]
   - Documents: [DOC-DEV-TEST-1]
 
+- [CON-PROBE-016]: Template Processing System
+  - Definition: Subsystem of the prompt assembly module that handles variable replacement, nested property access, and array iterations
+  - Related: [CON-PROBE-002], [CON-PROBE-017], [CON-PROBE-009]
+  - Documents: [DOC-TECH-PROM-1]
+
+- [CON-PROBE-017]: PromptError Handling System
+  - Definition: Structured error handling approach with specific error codes, detailed messages, and error propagation
+  - Related: [CON-PROBE-002], [CON-PROBE-016], [CON-PROBE-018]
+  - Documents: [DOC-TECH-PROM-1]
+
+- [CON-PROBE-018]: Test Isolation Pattern
+  - Definition: Approach for testing components by replacing dependencies with controlled mock implementations
+  - Related: [CON-PROBE-014], [CON-PROBE-017], [CON-PROBE-019]
+  - Documents: [DOC-DEV-TEST-1]
+
+- [CON-PROBE-019]: Error Code Validation System
+  - Definition: Testing strategy for verifying error types, codes and propagation in component interactions
+  - Related: [CON-PROBE-017], [CON-PROBE-018]
+  - Documents: [DOC-DEV-TEST-1]
+
 ## System Relationships
 1. [CON-SYS-001] → implements → [CON-SYS-002]
 2. [CON-SYS-001] → organizes by → [CON-SYS-003]
@@ -126,6 +146,14 @@
 19. [CON-PROBE-014] → supports → unit testing isolation
 20. [CON-PROBE-015] → implements → [CON-PROBE-014]
 21. [CON-PROBE-015] → ensures → code reliability
+22. [CON-PROBE-016] → powers → [CON-PROBE-002]
+23. [CON-PROBE-016] → processes → [CON-PROBE-009] templates
+24. [CON-PROBE-017] → enhances → robustness of [CON-PROBE-002]
+25. [CON-PROBE-017] → provides → structured error feedback
+26. [CON-PROBE-018] → enables → thorough unit testing
+27. [CON-PROBE-018] → implements → [CON-PROBE-014] for test isolation
+28. [CON-PROBE-019] → validates → [CON-PROBE-017] error handling
+29. [CON-PROBE-019] → enhances → code reliability
 
 ## Visual Representation
 ### Documentation System
@@ -282,4 +310,4 @@ Documentation System
 ```
 
 ## Last Updated
-2025-05-14T13:50:00Z | SESSION-007 | Claude
+2025-05-15T11:30:00Z | SESSION-008 | Claude

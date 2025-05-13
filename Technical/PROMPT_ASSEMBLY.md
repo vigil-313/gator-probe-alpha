@@ -80,127 +80,258 @@ Prompt templates are stored as JSON files with variable placeholders that are re
 }
 ```
 
-## Implementation Components (MVP)
+## Implemented PromptAssembler Class
 
-### 1. Configuration Loader
-Simple module for loading and validating JSON configuration files:
+The PromptAssembler provides a robust implementation for combining persona configurations, templates, and user input:
 
 ```javascript
-class ConfigLoader {
-  constructor(basePath) {
-    this.basePath = basePath;
-  }
-
-  async loadPersona(id) {
-    try {
-      const panelDirectories = ['evaluation-chamber', 'pathfinder-council', 'legal-panel'];
-
-      // For MVP, we do a simple search through all panel directories
-      for (const dir of panelDirectories) {
-        try {
-          return await this._loadJsonFile(`personas/${dir}/${id}.json`);
-        } catch (error) {
-          // File not found in this directory, continue to next
-          if (error.code !== 'ENOENT') throw error;
-        }
-      }
-
-      throw new Error(`Persona not found: ${id}`);
-    } catch (error) {
-      console.error(`Error loading persona ${id}:`, error);
-      throw new Error(`Failed to load persona ${id}`);
-    }
-  }
-
-  async loadTemplate(panelType) {
-    try {
-      return await this._loadJsonFile(`prompt-templates/${panelType}.json`);
-    } catch (error) {
-      console.error(`Error loading template for ${panelType}:`, error);
-      throw new Error(`Failed to load template for ${panelType}`);
-    }
-  }
-
-  // Private helper method
-  async _loadJsonFile(relativePath) {
-    const fs = require('fs').promises;
-    const path = require('path');
-    const fullPath = path.join(this.basePath, relativePath);
-
-    const data = await fs.readFile(fullPath, 'utf8');
-    return JSON.parse(data);
+/**
+ * Custom error class for prompt-related errors
+ */
+class PromptError extends Error {
+  constructor(message, code, details = {}) {
+    super(message);
+    this.name = 'PromptError';
+    this.code = code;
+    this.details = details;
   }
 }
-```
 
-### 2. Prompt Assembler
-Core class combining template processing and prompt assembly:
-
-```javascript
+/**
+ * The PromptAssembler class responsible for combining persona configurations, 
+ * templates, and user input to generate effective prompts for LLM API calls.
+ */
 class PromptAssembler {
+  /**
+   * Create a new PromptAssembler instance
+   * @param {Object} configLoader - Configuration loader instance
+   */
   constructor(configLoader) {
+    if (!configLoader) {
+      throw new PromptError(
+        'Configuration loader is required',
+        'PROMPT_CONFIG_MISSING'
+      );
+    }
     this.configLoader = configLoader;
+    this.ERROR_CODES = {
+      PERSONA_NOT_FOUND: 'PROMPT_PERSONA_NOT_FOUND',
+      TEMPLATE_NOT_FOUND: 'PROMPT_TEMPLATE_NOT_FOUND',
+      TEMPLATE_PROCESSING: 'PROMPT_TEMPLATE_PROCESSING',
+      USER_INPUT_INVALID: 'PROMPT_USER_INPUT_INVALID',
+      CONFIG_MISSING: 'PROMPT_CONFIG_MISSING'
+    };
   }
 
-  async assemblePrompt(personaId, userInput) {
-    // Load persona configuration
-    const persona = await this.configLoader.loadPersona(personaId);
-
-    // Determine panel type from persona
-    const panelType = persona.panelType || this._inferPanelType(personaId);
-
-    // Load appropriate template
-    const template = await this.configLoader.loadTemplate(panelType);
-
-    // Process the template with persona attributes and user input
-    return this._processTemplate(template, persona, userInput);
-  }
-
-  // Helper method to process template variables
-  _processTemplate(template, persona, userInput) {
-    let prompt = template.basePrompt;
-
-    // Replace persona-specific variables
-    Object.entries(persona).forEach(([key, value]) => {
-      // Handle nested objects by flattening
-      if (typeof value === 'object' && value !== null) {
-        Object.entries(this._flattenObject(value, key)).forEach(([nestedKey, nestedValue]) => {
-          prompt = prompt.replace(new RegExp(`\\{\\{${nestedKey}\\}\\}`, 'g'), nestedValue);
-        });
-      } else if (typeof value === 'string') {
-        prompt = prompt.replace(new RegExp(`\\{\\{${key}\\}\\}`, 'g'), value);
+  /**
+   * Assembles a complete prompt by combining persona configuration with a template and user input
+   * @param {string} personaId - The ID of the gator persona
+   * @param {string} userInput - The user's startup idea input
+   * @param {Object} options - Additional options for prompt assembly (optional)
+   * @returns {Promise<Object>} - The assembled prompt with system and user components
+   */
+  async assemblePrompt(personaId, userInput, options = {}) {
+    try {
+      // Validate inputs
+      if (!personaId) {
+        throw new PromptError(
+          'Persona ID is required', 
+          this.ERROR_CODES.PERSONA_NOT_FOUND
+        );
       }
-    });
-
-    // Replace user input variable
-    prompt = prompt.replace(/\{\{userInput\}\}/g, userInput);
-
-    return prompt;
-  }
-
-  // Helper method to flatten nested objects for template processing
-  _flattenObject(obj, prefix = '') {
-    const result = {};
-
-    Object.entries(obj).forEach(([key, value]) => {
-      const newKey = prefix ? `${prefix}.${key}` : key;
-
-      if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
-        Object.assign(result, this._flattenObject(value, newKey));
-      } else if (Array.isArray(value)) {
-        // Join array values with commas for simple MVP implementation
-        result[newKey] = value.join(', ');
-      } else if (typeof value === 'string') {
-        result[newKey] = value;
+      
+      if (!userInput || typeof userInput !== 'string') {
+        throw new PromptError(
+          'User input must be a non-empty string', 
+          this.ERROR_CODES.USER_INPUT_INVALID
+        );
       }
-    });
 
-    return result;
+      // Sanitize user input to prevent template injection
+      const sanitizedInput = this._sanitizeInput(userInput);
+      
+      // Load persona configuration
+      const persona = await this.configLoader.loadPersona(personaId);
+      
+      // Determine panel type from persona or options
+      const panelType = 
+        options.panelType || 
+        persona.panelType || 
+        this._inferPanelType(personaId);
+      
+      // Load appropriate template
+      const template = await this.configLoader.loadTemplate(panelType);
+      
+      // Process the template with persona attributes and user input
+      const systemPrompt = this._processTemplate(template.basePrompt, persona, sanitizedInput);
+      
+      // Return structured prompt with separate system and user components
+      return {
+        system: systemPrompt,
+        user: sanitizedInput,
+        metadata: {
+          personaId,
+          panelType,
+          timestamp: new Date().toISOString()
+        }
+      };
+    } catch (error) {
+      // If it's already a PromptError, rethrow it
+      if (error instanceof PromptError) {
+        throw error;
+      }
+      
+      // Otherwise, wrap it in a PromptError with appropriate error code
+      if (error.message.includes('not found')) {
+        throw new PromptError(
+          `Failed to find persona: ${personaId}`,
+          this.ERROR_CODES.PERSONA_NOT_FOUND,
+          { personaId, originalError: error.message }
+        );
+      }
+      
+      throw new PromptError(
+        `Error assembling prompt: ${error.message}`,
+        this.ERROR_CODES.TEMPLATE_PROCESSING,
+        { personaId, originalError: error.message }
+      );
+    }
   }
 
-  // Helper method to infer panel type from persona ID
+  /**
+   * Process template string with persona attributes and user input.
+   * Supports variable replacement, array iterations, and nested properties.
+   * @param {string} templateString - The template string containing variables
+   * @param {Object} persona - The persona configuration object
+   * @param {string} userInput - The sanitized user input
+   * @returns {string} - The processed template with all variables replaced
+   * @private
+   */
+  _processTemplate(templateString, persona, userInput) {
+    try {
+      let result = templateString;
+      
+      // Process array iterations first (e.g., {{#array}}...{{/array}})
+      result = this._processArrayBlocks(result, persona);
+      
+      // Replace all variables with their values
+      result = this._replaceVariables(result, persona);
+      
+      // Replace user input last to ensure it doesn't interfere with template processing
+      result = result.replace(/\{\{userInput\}\}/g, userInput);
+      
+      return result;
+    } catch (error) {
+      throw new PromptError(
+        `Template processing error: ${error.message}`,
+        this.ERROR_CODES.TEMPLATE_PROCESSING,
+        { originalError: error.message }
+      );
+    }
+  }
+
+  /**
+   * Process template blocks for array iterations
+   * @param {string} template - The template string
+   * @param {Object} data - The data object (persona)
+   * @returns {string} - Processed template with array blocks expanded
+   * @private
+   */
+  _processArrayBlocks(template, data) {
+    // Regular expression to match array iteration blocks: {{#array}}...{{/array}}
+    const arrayBlockRegex = /\{\{#([\w\.]+)\}\}([\s\S]*?)\{\{\/\1\}\}/g;
+    
+    return template.replace(arrayBlockRegex, (match, arrayPath, blockContent) => {
+      const arrayValue = this._getPropertyValue(data, arrayPath);
+      
+      // If not an array or empty, return empty string
+      if (!Array.isArray(arrayValue) || arrayValue.length === 0) {
+        return '';
+      }
+      
+      // Process each array item
+      return arrayValue.map(item => {
+        let content = blockContent;
+        
+        // If item is an object, replace variables in the block
+        if (typeof item === 'object' && item !== null) {
+          // Replace {{.property}} with the item's property value
+          content = content.replace(/\{\{\.([\w]+)\}\}/g, (_, prop) => 
+            item[prop] || '');
+        } else {
+          // Replace {{.}} with the item itself
+          content = content.replace(/\{\{\.\}\}/g, item);
+        }
+        
+        return content;
+      }).join('\n');
+    });
+  }
+
+  /**
+   * Replace all variables in a template with their values
+   * @param {string} template - The template string
+   * @param {Object} data - The data object (persona)
+   * @returns {string} - Template with all variables replaced
+   * @private
+   */
+  _replaceVariables(template, data) {
+    return template.replace(/\{\{([\w\.]+)\}\}/g, (match, path) => {
+      // Skip userInput as it's handled separately
+      if (path === 'userInput') return match;
+      
+      const value = this._getPropertyValue(data, path);
+      
+      // Handle different value types
+      if (Array.isArray(value)) {
+        return value.join(', ');
+      } else if (value === null || value === undefined) {
+        return '';
+      } else if (typeof value === 'object') {
+        // Convert object to string representation
+        return JSON.stringify(value);
+      }
+      
+      return String(value);
+    });
+  }
+
+  /**
+   * Get a property value from an object using dot notation path
+   * @param {Object} obj - The object to extract from
+   * @param {string} path - The property path (e.g., 'user.profile.name')
+   * @returns {*} - The property value or undefined if not found
+   * @private
+   */
+  _getPropertyValue(obj, path) {
+    return path.split('.').reduce((current, key) => {
+      return current !== undefined && current !== null ? current[key] : undefined;
+    }, obj);
+  }
+
+  /**
+   * Sanitize user input to prevent template injection
+   * @param {string} input - User input to sanitize
+   * @returns {string} - Sanitized input
+   * @private
+   */
+  _sanitizeInput(input) {
+    // Replace any template-like patterns that could cause issues
+    return input
+      .replace(/\{\{/g, '{ {')
+      .replace(/\}\}/g, '} }')
+      // Additional sanitization as needed
+      .trim();
+  }
+
+  /**
+   * Infer panel type from persona ID based on known persona lists
+   * @param {string} personaId - The persona ID
+   * @returns {string} - The inferred panel type
+   * @private
+   */
   _inferPanelType(personaId) {
-    // Simple inference logic for MVP
+    // Comprehensive lists of all personas by panel type
     const evaluationPersonas = ['rex', 'vanessa', 'finley', 'tessa', 'huxley', 'maya', 'lucius', 'ada-bloom', 'jax-morrow', 'dr-cass-nova', 'nyx', 'kip-snapjaw', 'serena-vale'];
     const pathfinderPersonas = ['zane', 'luma', 'bram', 'ori', 'echo', 'vex', 'nell', 'sol', 'dr-vire-glint'];
     const legalPersonas = ['lex', 'clara', 'rana-regulus', 'gavin-graymark', 'delphi-docket', 'isla-proxy', 'morven-sealight'];
@@ -240,12 +371,102 @@ The system supports three distinct panel types, each with a tailored template st
 }
 ```
 
+## Template Syntax Features
+
+The implemented prompt assembly system supports the following template syntax features:
+
+### 1. Simple Variable Replacement
+```
+{{variable}}
+```
+Replaces the placeholder with the value of the specified variable.
+
+### 2. Nested Property Access
+```
+{{object.property.subproperty}}
+```
+Accesses nested properties using dot notation paths.
+
+### 3. Array Iteration
+```
+{{#array}}
+  This item is {{.}}
+{{/array}}
+```
+Iterates through array items, replacing `{{.}}` with each item value.
+
+### 4. Object Array Iteration
+```
+{{#arrayOfObjects}}
+  Name: {{.name}}, Value: {{.value}}
+{{/arrayOfObjects}}
+```
+Iterates through arrays of objects, allowing access to properties of each object.
+
+### 5. Default Formatting
+- Arrays are joined with commas when used directly: `{{array}}` → `item1, item2, item3`
+- Objects are converted to their JSON string representation
+- `null` and `undefined` values are replaced with empty strings
+
+## Usage Examples
+
+### Basic Template Example
+```javascript
+const personaId = 'rex';
+const userInput = 'An AI app that helps people write breakup texts';
+
+const promptAssembler = new PromptAssembler(configLoader);
+const prompt = await promptAssembler.assemblePrompt(personaId, userInput);
+
+console.log(prompt.system); // The system prompt with all variables replaced
+console.log(prompt.user);  // The sanitized user input
+```
+
+### Complete Integration Example
+```javascript
+// Import dependencies
+import { PromptAssembler } from './prompt/index.js';
+import { ConfigLoader } from './config/index.js';
+
+// Setup configuration
+const configPath = './config';
+const configLoader = new ConfigLoader(configPath);
+
+// Create prompt assembler
+const promptAssembler = new PromptAssembler(configLoader);
+
+// Assemble prompt
+async function generatePrompt(personaId, userInput) {
+  try {
+    const prompt = await promptAssembler.assemblePrompt(personaId, userInput);
+    return prompt;
+  } catch (error) {
+    console.error(`Error generating prompt: ${error.message}`);
+    if (error.code === 'PROMPT_PERSONA_NOT_FOUND') {
+      // Handle missing persona error
+    }
+    throw error;
+  }
+}
+```
+
 ## API Integration
 
-The system will integrate with the LLM API (initially Claude) using this approach:
+The system integrates with the LLM API (initially Claude) using the PromptAssembler output:
 
 ```javascript
-// Simple request format for Claude API (MVP implementation)
+// Assembled prompt structure
+{
+  system: "You are roleplaying as Rex Revenue...",
+  user: "An AI app that helps people write breakup texts",
+  metadata: {
+    personaId: "rex",
+    panelType: "evaluation",
+    timestamp: "2025-05-15T10:42:15.123Z"
+  }
+}
+
+// Simple request format for Claude API
 {
   "model": "claude-3-sonnet-20240229",
   "temperature": 0.7,
@@ -257,7 +478,7 @@ The system will integrate with the LLM API (initially Claude) using this approac
     },
     {
       "role": "user",
-      "content": "Evaluate this startup idea: [user input]"
+      "content": "An AI app that helps people write breakup texts"
     }
   ]
 }
@@ -268,21 +489,27 @@ The system will integrate with the LLM API (initially Claude) using this approac
 The prompt assembly system is designed with several extension points for future development:
 
 1. **Processing Pipeline**
-   - Add pre-processing steps for user input sanitization
-   - Implement post-processing for persona-specific formatting
-   - Support for conditional template sections
+   - ✅ User input sanitization is implemented
+   - Add post-processing for persona-specific formatting
+   - ✅ Support for array iteration blocks is implemented
+   - Add conditional template sections (if/else blocks)
 
 2. **Template Enhancements**
-   - Advanced variable formatting options
-   - Dynamic template selection based on input content
-   - Template versioning support
+   - Add format specifiers (e.g., `{{variable:uppercase}}`, `{{date:YYYY-MM-DD}}`)
+   - Add dynamic template selection based on input content
+   - Implement template inheritance and composition
 
 3. **Multi-turn Support**
-   - Context preservation between interactions
-   - History-aware template adjustments
-   - Progressive persona responses
+   - Add conversation context preservation between interactions
+   - Implement history-aware template adjustments
+   - Support for progressive persona responses
+
+4. **Error Handling and Validation**
+   - ✅ Custom PromptError class with error codes is implemented
+   - ✅ Input validation and sanitization is implemented
+   - Add template validation to verify all variables exist
 
 These extension points are documented in more detail in `/Technical/EXTENSION_POINTS.md`.
 
 ## Last Updated
-2025-05-12T17:45:00-07:00 | SESSION-004 | Claude
+2025-05-15T10:45:00Z | SESSION-008 | Claude

@@ -1,0 +1,101 @@
+# Claude Code Implementation Session
+
+This file contains the prompt to be used with claude.ai/code for implementing this specific task.
+Copy the entire content between the START PROMPT and END PROMPT markers into Claude Code.
+
+-------------------START PROMPT-------------------
+# IMPLEMENTATION TASK 5: Prompt Assembly Unit Tests
+
+## Context
+The prompt assembly module is responsible for combining persona configurations, prompt templates, and user input to create effective prompts for the LLM API. To ensure its reliability and correctness, we need comprehensive unit tests.
+
+## Objective
+Create a comprehensive test suite for the prompt assembly module that verifies template processing, variable replacement, error handling, and integration with the configuration loader.
+
+## Starting Point
+- The prompt assembly module has been implemented in TASK4
+- The project uses Jest for testing
+- The configuration loader has already been implemented and tested
+- Test files should be located in the `/tests/prompt` directory
+
+## Requirements
+- Create comprehensive unit tests for the prompt assembly module
+- Test template processing functionality
+- Test variable replacement with nested objects and arrays
+- Test error handling
+- Mock the configuration loader to isolate tests
+- Ensure all public methods are tested
+
+## Steps
+1. Create a test file at `/tests/prompt/assembler.test.js`
+
+2. Set up mock configuration loader:
+   - Create a mock of the configuration loader
+   - Configure it to return predetermined data for testing
+   - Create mock persona configurations
+   - Create mock prompt templates
+
+3. Test basic prompt assembly:
+   - Test assembling a complete prompt with a simple template
+   - Verify correct variable replacement
+   - Verify correct inclusion of user input
+
+4. Test template processing features:
+   - Test replacement of simple variables
+   - Test access to nested object properties
+   - Test iteration over arrays
+   - Test conditional sections in templates
+
+5. Test panel type inference:
+   - Test correct inference of panel type from persona ID
+   - Test fallback to default panel type
+
+6. Test error handling:
+   - Test behavior with missing persona
+   - Test behavior with missing template
+   - Test behavior with invalid template syntax
+   - Test behavior with missing required variables
+
+7. Test edge cases:
+   - Test with minimal valid inputs
+   - Test with complex nested structures
+   - Test with special characters in variables
+
+8. Ensure all tests are properly organized and documented
+
+## References
+- [DOC-DEV-IMPL-EXT-1]: Implementation Extensibility Guidelines
+- [DOC-TECH-PROM-1]: Prompt Templates Documentation
+
+## Constraints
+- Use Jest's mocking capabilities
+- Tests should run quickly and not depend on external resources
+- Follow Jest best practices for test organization
+- Mock the configuration loader rather than using the actual implementation
+
+## Expected Output
+A comprehensive test suite that:
+- Verifies all functionality of the prompt assembly module
+- Provides good code coverage
+- Includes tests for edge cases and error conditions
+- Is well-organized and documented
+
+## Validation
+- All tests should pass
+- Tests should provide good coverage of the prompt assembly module
+- Tests should verify both successful operations and error conditions
+- Tests should be readable and maintainable
+
+## Next Steps
+After ensuring the prompt assembly module is properly tested, we will implement the LLM API client (TASK6) which will use the assembled prompts to interact with the LLM service.
+-------------------END PROMPT-------------------
+
+## After Implementation
+
+Once Claude Code has completed this implementation task:
+
+1. Save all generated code to the appropriate locations in Development/Implementation/
+2. Update the session state and development documentation
+3. Mark the implementation task as complete in the Implementation Plan
+4. Ensure all files are in their proper directories according to VISTA structure
+5. Prepare for the next implementation task

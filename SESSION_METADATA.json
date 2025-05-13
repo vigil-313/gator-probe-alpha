@@ -1,10 +1,10 @@
 {
   "current_session": {
     "id": "SESSION-007",
-    "status": "concluded",
+    "status": "concluding",
     "start_time": "2025-05-14T10:00:00Z",
     "expected_end_time": "2025-05-14T12:00:00Z",
-    "actual_end_time": "2025-05-13T06:16:28Z"
+    "actual_end_time": "2025-05-13T07:17:10Z"
   },
   "session_history": [
     {
