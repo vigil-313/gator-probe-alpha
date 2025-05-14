@@ -351,9 +351,34 @@ main {
   padding: 15px;
   z-index: 100000; /* Ensure it's above ALL elements */
   text-align: left;
-  pointer-events: none;
+  pointer-events: auto; /* Changed to allow interaction on mobile */
   border: 1px solid rgba(0,0,0,0.1);
   animation: fadeIn 0.15s ease-in;
+}
+
+/* Close button for mobile */
+.popup-close-button {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background-color: var(--bg-secondary);
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+  z-index: 1;
+}
+
+.popup-close-button:hover,
+.popup-close-button:active {
+  background-color: var(--border-color);
+  color: var(--text-color);
 }
 
 /* Arrow for popup - default top */
@@ -488,6 +513,22 @@ main {
   
   .persona-tile {
     padding: 6px;
+  }
+  
+  /* Mobile-specific popup styles */
+  .persona-popup {
+    max-width: 85vw; /* Limit width on mobile */
+    width: auto !important; /* Override inline style */
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  }
+  
+  /* Make close button more prominent on mobile */
+  .popup-close-button {
+    width: 28px;
+    height: 28px;
+    font-size: 20px;
+    background-color: var(--bg-color);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   }
 }
 

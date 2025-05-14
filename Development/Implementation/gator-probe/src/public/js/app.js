@@ -227,7 +227,7 @@ document.addEventListener('DOMContentLoaded', () => {
       expertiseTags = persona.expertise;
     }
     
-    // Add event handlers for hover
+    // Add event handlers for hover and touch
     tile.addEventListener('mouseenter', () => {
       // Create popup if doesn't exist
       showPersonaPopup(persona, panelType, expertiseTags, tile);
@@ -237,6 +237,33 @@ document.addEventListener('DOMContentLoaded', () => {
       // Remove popup when mouse leaves
       hidePersonaPopup();
     });
+    
+    // Add touch events for mobile devices
+    tile.addEventListener('touchstart', (e) => {
+      // Prevent default to avoid immediate click event
+      e.preventDefault();
+      // Check if popup is already shown
+      const existingPopup = document.getElementById('persona-popup');
+      if (existingPopup) {
+        // If already shown, hide it (acting like a toggle)
+        hidePersonaPopup();
+      } else {
+        // Otherwise show it
+        showPersonaPopup(persona, panelType, expertiseTags, tile);
+      }
+    });
+    
+    // Add touch event to document to dismiss popup when touching elsewhere
+    if (!document.touchEndInitialized) {
+      document.addEventListener('touchstart', (e) => {
+        // Check if we have a popup and the touch wasn't on a tile
+        const popup = document.getElementById('persona-popup');
+        if (popup && !e.target.closest('.persona-tile')) {
+          hidePersonaPopup();
+        }
+      });
+      document.touchEndInitialized = true;
+    }
     
     // Add click event to select this persona
     tile.addEventListener('click', () => handlePersonaTileClick(tile, persona, panelType));
@@ -262,6 +289,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Add content to the popup
     popup.innerHTML = `
+      <div class="popup-close-button">×</div>
       <div class="detail-panel-type ${panelType}">${getPanelDisplayName(panelType)}</div>
       <h6>${persona.name} ${persona.nickname ? `"${persona.nickname}"` : ''}</h6>
       <div class="detail-archetype">${persona.archetype || 'Gator Persona'}</div>
@@ -275,6 +303,15 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Append to body (not inside the container)
     document.body.appendChild(popup);
+    
+    // Add event listener for close button
+    const closeButton = popup.querySelector('.popup-close-button');
+    if (closeButton) {
+      closeButton.addEventListener('click', (e) => {
+        e.stopPropagation();
+        hidePersonaPopup();
+      });
+    }
     
     // Position the popup near the tile, but check if it would go off-screen
     const tileRect = tile.getBoundingClientRect();
