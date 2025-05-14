@@ -138,6 +138,26 @@
   - Related: [CON-PROBE-014], [CON-PROBE-018], [CON-PROBE-020], [CON-PROBE-021]
   - Documents: [DOC-DEV-TEST-1]
 
+- [CON-PROBE-024]: Express Server API Architecture
+  - Definition: RESTful API design for the Express server with validation, error handling, and proper resource organization
+  - Related: [CON-PROBE-002], [CON-PROBE-004], [CON-PROBE-025], [CON-PROBE-026]
+  - Documents: [DOC-TECH-API-1]
+
+- [CON-PROBE-025]: API Request Validation System
+  - Definition: Middleware-based validation system for ensuring API request data meets format and content requirements
+  - Related: [CON-PROBE-024], [CON-PROBE-026], [CON-PROBE-017]
+  - Documents: [DOC-TECH-API-1]
+
+- [CON-PROBE-026]: Unified Error Handling Middleware
+  - Definition: Express middleware that provides consistent error responses, proper HTTP status codes, and error type mapping
+  - Related: [CON-PROBE-024], [CON-PROBE-025], [CON-PROBE-022], [CON-PROBE-017]
+  - Documents: [DOC-TECH-API-1]
+
+- [CON-PROBE-027]: Server Test Spy Strategy
+  - Definition: Testing approach using Jest's spyOn functionality for more flexible and less intrusive dependency mocking
+  - Related: [CON-PROBE-014], [CON-PROBE-018], [CON-PROBE-023]
+  - Documents: [DOC-DEV-TEST-1]
+
 ## System Relationships
 1. [CON-SYS-001] → implements → [CON-SYS-002]
 2. [CON-SYS-001] → organizes by → [CON-SYS-003]
@@ -179,6 +199,15 @@
 32. [CON-PROBE-022] → extends → [CON-PROBE-017] approach for APIs
 33. [CON-PROBE-023] → verifies → [CON-PROBE-020], [CON-PROBE-021], [CON-PROBE-022]
 34. [CON-PROBE-023] → applies → [CON-PROBE-014], [CON-PROBE-018] for API testing
+35. [CON-PROBE-024] → exposes → RESTful API endpoints
+36. [CON-PROBE-024] → integrates with → [CON-PROBE-002], [CON-PROBE-004]
+37. [CON-PROBE-024] → uses → [CON-PROBE-025], [CON-PROBE-026] for request handling
+38. [CON-PROBE-025] → ensures → valid API requests
+39. [CON-PROBE-025] → prevents → malformed data processing
+40. [CON-PROBE-026] → converts → component errors to HTTP responses
+41. [CON-PROBE-026] → handles → [CON-PROBE-017], [CON-PROBE-022] error types
+42. [CON-PROBE-027] → enhances → server testing isolation
+43. [CON-PROBE-027] → improves upon → [CON-PROBE-014], [CON-PROBE-018]
 
 ## Visual Representation
 ### Documentation System
@@ -377,4 +406,4 @@ Documentation System
 ```
 
 ## Last Updated
-2025-05-13T01:30:00Z | SESSION-010 | Claude
+2025-05-17T10:00:00Z | SESSION-012 | Claude
