@@ -1,0 +1,16 @@
+/* Token usage display styles */
+.token-usage {
+  margin-top: 15px;
+  padding-top: 10px;
+  border-top: 1px solid #eee;
+  font-size: 14px;
+}
+
+.token-info {
+  color: #666;
+  margin-bottom: 5px;
+  background-color: #f8f9fa;
+  padding: 5px 10px;
+  border-radius: 4px;
+  display: inline-block;
+}

@@ -66,8 +66,8 @@ const validateGenerateRequest = (data) => {
   
   if (!data.userInput) {
     errors.push('userInput is required');
-  } else if (typeof data.userInput === 'string' && data.userInput.length > 2000) {
-    errors.push('userInput exceeds maximum length of 2000 characters');
+  } else if (typeof data.userInput === 'string' && data.userInput.length > 7000) {
+    errors.push('userInput exceeds maximum length of 7000 characters');
   }
   
   if (errors.length > 0) {

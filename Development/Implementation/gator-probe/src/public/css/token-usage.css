@@ -1,0 +1,75 @@
+/* Token usage display styles */
+.token-usage {
+  margin-top: 20px;
+  font-size: 14px;
+}
+
+.token-info-container {
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+}
+
+.token-info-header {
+  background-color: #2c7a7b;
+  color: white;
+  padding: 10px 15px;
+  font-weight: 600;
+  font-size: 14px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.token-metrics {
+  padding: 12px 15px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.token-metric {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid #edf2f7;
+}
+
+.token-metric:last-child {
+  border-bottom: none;
+}
+
+.token-metric.cost {
+  grid-column: span 2;
+  margin-top: 8px;
+  border-top: 1px solid #e2e8f0;
+  padding-top: 12px;
+  font-weight: bold;
+}
+
+.metric-label {
+  color: #4a5568;
+  font-size: 13px;
+}
+
+.metric-value {
+  color: #2d3748;
+  font-weight: 600;
+}
+
+.cost .metric-value {
+  color: #38a169;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+@media (max-width: 640px) {
+  .token-metrics {
+    grid-template-columns: 1fr;
+  }
+  
+  .token-metric.cost {
+    grid-column: span 1;
+  }
+}

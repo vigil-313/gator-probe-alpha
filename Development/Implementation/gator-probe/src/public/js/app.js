@@ -436,16 +436,81 @@ document.addEventListener('DOMContentLoaded', () => {
    */
   function updateCharCount() {
     const count = ideaInput.value.length;
+    const MAX_CHARS = 7000;
     charCounter.textContent = count;
     
     // Add warning or error class based on count
-    charCounter.classList.remove('warning', 'error');
+    charCounter.classList.remove('warning', 'error', 'pulse', 'exceed');
+    ideaInput.classList.remove('warning-border', 'error-border', 'exceed-border');
+    document.querySelector('.char-count').classList.remove('warning-bg', 'error-bg', 'exceed-bg');
     
-    if (count > 1500 && count <= 1800) {
+    // Get the character counter container
+    const charCountContainer = document.querySelector('.char-count');
+    
+    // Calculate percentage of limit
+    const percentage = (count / MAX_CHARS) * 100;
+    
+    if (percentage > 70 && percentage <= 90) {
+      // Warning at 70-90%
       charCounter.classList.add('warning');
-    } else if (count > 1800) {
-      charCounter.classList.add('error');
+      ideaInput.classList.add('warning-border');
+      charCountContainer.classList.add('warning-bg');
+      
+      // Show approaching limit message
+      if (!document.querySelector('.warning-message') && percentage > 80) {
+        const warningMessage = document.createElement('div');
+        warningMessage.className = 'warning-message';
+        warningMessage.textContent = `You're approaching the character limit`;
+        charCountContainer.appendChild(warningMessage);
+      }
+    } else if (percentage > 90 && percentage <= 100) {
+      // Near limit at 90-100% - still yellow, not red
+      charCounter.classList.add('warning', 'pulse');
+      ideaInput.classList.add('warning-border');
+      charCountContainer.classList.add('warning-bg');
+      
+      // Show near limit message
+      if (!document.querySelector('.warning-message')) {
+        const oldWarning = document.querySelector('.warning-message');
+        if (oldWarning) oldWarning.remove();
+        
+        const warningMessage = document.createElement('div');
+        warningMessage.className = 'warning-message';
+        warningMessage.textContent = `You're very close to the ${MAX_CHARS.toLocaleString()} character limit`;
+        charCountContainer.appendChild(warningMessage);
+      }
+    } else if (percentage > 100) {
+      // Exceeded limit
+      charCounter.classList.add('exceed', 'pulse');
+      ideaInput.classList.add('exceed-border', 'shake');
+      charCountContainer.classList.add('exceed-bg');
+      
+      // Show exceeded message
+      if (!document.querySelector('.exceed-message')) {
+        const exceedMessage = document.createElement('div');
+        exceedMessage.className = 'exceed-message';
+        exceedMessage.textContent = `You've exceeded the ${MAX_CHARS.toLocaleString()} character limit!`;
+        charCountContainer.appendChild(exceedMessage);
+      }
+      
+      setTimeout(() => {
+        ideaInput.classList.remove('shake');
+      }, 600);
+    } else {
+      // Remove any messages if exists and count is now below warning threshold
+      const exceedMessage = document.querySelector('.exceed-message');
+      if (exceedMessage) {
+        exceedMessage.remove();
+      }
+      
+      const warningMessage = document.querySelector('.warning-message');
+      if (warningMessage) {
+        warningMessage.remove();
+      }
     }
+    
+    // Update character limit display
+    document.getElementById('char-limit').textContent = MAX_CHARS.toLocaleString();
   }
 
   /**
@@ -594,8 +659,14 @@ DISCLAIMER: This analysis is for informational purposes only and does not consti
       return false;
     }
     
-    if (ideaValue.length > 2000) {
-      showError('Your idea exceeds the 2000 character limit');
+    const MAX_CHARS = 7000;
+    if (ideaValue.length > MAX_CHARS) {
+      showError(`Your idea exceeds the ${MAX_CHARS.toLocaleString()} character limit`);
+      // Add animated highlight to the textarea
+      ideaInput.classList.add('error-border', 'shake');
+      setTimeout(() => {
+        ideaInput.classList.remove('shake');
+      }, 600);
       return false;
     }
     
@@ -637,13 +708,62 @@ DISCLAIMER: This analysis is for informational purposes only and does not consti
       personaDescription.textContent = '';
     }
     
-    // Handle either response or content field
+    // Clear the response area first
+    gatorResponse.innerHTML = '';
+    
+    // Add the main response content
+    const responseContent = document.createElement('p');
     if (data.content) {
-      gatorResponse.textContent = data.content;
+      responseContent.textContent = data.content;
     } else if (data.response) {
-      gatorResponse.textContent = data.response;
+      responseContent.textContent = data.response;
     } else {
-      gatorResponse.textContent = "No response content available";
+      responseContent.textContent = "No response content available";
+    }
+    gatorResponse.appendChild(responseContent);
+    
+    // Add token usage information if available
+    const usageData = data.metadata?.usage;
+    if (usageData && (usageData.input_tokens || usageData.output_tokens)) {
+      console.log('Showing token usage:', usageData);
+      // Calculate approximate cost (using Claude Sonnet pricing as default)
+      const inputTokens = usageData.input_tokens || 0;
+      const outputTokens = usageData.output_tokens || 0;
+      const totalTokens = inputTokens + outputTokens;
+      
+      // Claude Sonnet pricing: $3/million input tokens, $15/million output tokens
+      const inputCost = (inputTokens / 1000000) * 3;
+      const outputCost = (outputTokens / 1000000) * 15;
+      const totalCost = inputCost + outputCost;
+      
+      const usageElement = document.createElement('div');
+      usageElement.classList.add('token-usage');
+      usageElement.innerHTML = `
+        <div class="token-info-container">
+          <div class="token-info-header">API Usage Details</div>
+          <div class="token-metrics">
+            <div class="token-metric">
+              <span class="metric-label">Input Tokens:</span>
+              <span class="metric-value">${inputTokens.toLocaleString()}</span>
+            </div>
+            <div class="token-metric">
+              <span class="metric-label">Output Tokens:</span>
+              <span class="metric-value">${outputTokens.toLocaleString()}</span>
+            </div>
+            <div class="token-metric">
+              <span class="metric-label">Total Tokens:</span>
+              <span class="metric-value">${totalTokens.toLocaleString()}</span>
+            </div>
+            <div class="token-metric cost">
+              <span class="metric-label">Estimated Cost:</span>
+              <span class="metric-value">$${totalCost.toFixed(4)}</span>
+            </div>
+          </div>
+        </div>
+      `;
+      gatorResponse.appendChild(usageElement);
+    } else {
+      console.log('No token usage data available');
     }
     
     console.log('Response data to display:', data);

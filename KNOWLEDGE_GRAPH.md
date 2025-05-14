@@ -228,6 +228,11 @@
   - Related: [CON-PROBE-038], [CON-PROBE-039], [CON-PROBE-005]
   - Documents: [DOC-DEV-TEST-1]
 
+- [CON-PROBE-042]: Natural Prompt Design
+  - Definition: Approach to AI prompt engineering that prioritizes authentic character expression over rigid formats
+  - Related: [CON-PROBE-002], [CON-PROBE-009], [CON-PROBE-016]
+  - Documents: [DOC-TECH-INS-001]
+
 ## System Relationships
 1. [CON-SYS-001] → implements → [CON-SYS-002]
 2. [CON-SYS-001] → organizes by → [CON-SYS-003]
@@ -310,6 +315,9 @@
 73. [CON-PROBE-040] → verifies → resource usage and cleanup
 74. [CON-PROBE-041] → tests → complete user journey
 75. [CON-PROBE-041] → validates → all integration points
+76. [CON-PROBE-042] → enhances → [CON-PROBE-002] prompt effectiveness
+77. [CON-PROBE-042] → improves → persona authenticity
+78. [CON-PROBE-042] → counters → formulaic response patterns
 
 ## Visual Representation
 ### Documentation System

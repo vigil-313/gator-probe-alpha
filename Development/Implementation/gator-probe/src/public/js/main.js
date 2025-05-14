@@ -57,10 +57,13 @@ document.addEventListener('DOMContentLoaded', () => {
       
       if (data && data.status === 'success' && data.data) {
         // Handle the response based on the format
+        // Extract usage data if available
+        const usageData = data.data.metadata?.usage || null;
+        
         if (data.data.response) {
-          showMessage(data.data.response, 'success');
+          showMessage(data.data.response, 'success', usageData);
         } else if (data.data.content) {
-          showMessage(data.data.content, 'success');
+          showMessage(data.data.content, 'success', usageData);
         } else {
           throw new Error('Response missing content');
         }
@@ -83,7 +86,7 @@ document.addEventListener('DOMContentLoaded', () => {
    * @param {string} message - The message to display
    * @param {string} type - Message type (loading, error, success)
    */
-  function showMessage(message, type) {
+  function showMessage(message, type, usageData) {
     gatorResponse.innerHTML = '';
     
     const messageElement = document.createElement('p');
@@ -91,5 +94,23 @@ document.addEventListener('DOMContentLoaded', () => {
     messageElement.classList.add(type);
     
     gatorResponse.appendChild(messageElement);
+    
+    // Show usage data if available
+    if (usageData && (usageData.input_tokens || usageData.output_tokens)) {
+      console.log('Showing token usage:', usageData);
+      const usageElement = document.createElement('div');
+      usageElement.classList.add('token-usage');
+      usageElement.innerHTML = `
+        <p class="token-info">
+          <strong>Token Usage:</strong> 
+          Input: ${usageData.input_tokens || 0} | 
+          Output: ${usageData.output_tokens || 0} | 
+          Total: ${(usageData.input_tokens || 0) + (usageData.output_tokens || 0)}
+        </p>
+      `;
+      gatorResponse.appendChild(usageElement);
+    } else {
+      console.log('No token usage data available');
+    }
   }
 });
