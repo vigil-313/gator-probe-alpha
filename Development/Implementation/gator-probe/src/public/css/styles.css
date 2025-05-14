@@ -214,6 +214,23 @@ main {
   margin-bottom: 12px;
 }
 
+/* Info for mobile users */
+.touch-info {
+  text-align: center;
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-top: 8px;
+  font-style: italic;
+  display: none;
+}
+
+/* Only show on touch devices */
+@media (hover: none) {
+  .touch-info {
+    display: block;
+  }
+}
+
 .legend-item {
   display: flex;
   align-items: center;

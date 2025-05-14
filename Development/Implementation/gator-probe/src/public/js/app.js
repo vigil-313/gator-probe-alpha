@@ -238,23 +238,44 @@ document.addEventListener('DOMContentLoaded', () => {
       hidePersonaPopup();
     });
     
-    // Add touch events for mobile devices
-    tile.addEventListener('touchend', (e) => {
-      // Don't prevent default to allow scrolling
-      // Only handle if this is a tap, not a scroll
-      if (!window.touchMoved) {
-        // Check if popup is already shown
-        const existingPopup = document.getElementById('persona-popup');
-        if (existingPopup) {
-          // If already shown, hide it (acting like a toggle)
-          hidePersonaPopup();
-        } else {
-          // Otherwise show it
+    // Add touch events for mobile devices - using longpress for popup
+    let touchTimeout;
+    let touchStartX, touchStartY;
+    
+    tile.addEventListener('touchstart', (e) => {
+      if (e.touches.length === 1) {
+        // Store the initial touch position
+        touchStartX = e.touches[0].clientX;
+        touchStartY = e.touches[0].clientY;
+        
+        // Set a timeout to show popup after a long press (500ms)
+        touchTimeout = setTimeout(() => {
           showPersonaPopup(persona, panelType, expertiseTags, tile);
-        }
-        // Prevent click event from firing
-        e.preventDefault();
+          // Mark that we showed a popup so we don't trigger a click
+          tile.setAttribute('data-showed-popup', 'true');
+        }, 500);
       }
+    });
+    
+    // Handle touch end - decide whether to select the persona or not
+    tile.addEventListener('touchend', (e) => {
+      // Clear the long press timeout
+      clearTimeout(touchTimeout);
+      
+      // Only if it's a tap (not a scroll) and we didn't just show a popup
+      if (!window.touchMoved && tile.getAttribute('data-showed-popup') !== 'true') {
+        // Treat as a normal click - select this persona
+        handlePersonaTileClick(tile, persona, panelType);
+      }
+      
+      // Reset the popup flag
+      tile.removeAttribute('data-showed-popup');
+    });
+    
+    // Handle touch cancel
+    tile.addEventListener('touchcancel', () => {
+      clearTimeout(touchTimeout);
+      tile.removeAttribute('data-showed-popup');
     });
     
     // Track touch movement for scroll detection
@@ -266,29 +287,26 @@ document.addEventListener('DOMContentLoaded', () => {
       window.touchMoved = true;
     });
     
-    // Add touch event to document to dismiss popup when touching elsewhere
-    if (!document.touchEndInitialized) {
+    // Global document touch handlers for popup management (if not already initialized)
+    if (!document.touchHandlersInitialized) {
+      // Dismiss popup when tapping outside
       document.addEventListener('touchend', (e) => {
-        // Check if this was a tap (not a scroll) and if we have a popup
-        if (!window.touchMoved) {
-          const popup = document.getElementById('persona-popup');
-          // If popup exists and touch wasn't on a tile or popup
-          if (popup && !e.target.closest('.persona-tile') && !e.target.closest('.persona-popup')) {
+        const popup = document.getElementById('persona-popup');
+        // Only if a popup exists and we're not touching inside the popup
+        if (popup && !e.target.closest('.persona-popup') && !e.target.closest('.popup-close-button')) {
+          // Don't dismiss if we just tapped on a tile (the tile will handle that)
+          if (!e.target.closest('.persona-tile')) {
             hidePersonaPopup();
           }
         }
       });
       
-      // Track document touch movement for scroll detection
-      document.addEventListener('touchstart', () => {
-        window.touchMoved = false;
-      });
-      
+      // Track touch movement for the global document
       document.addEventListener('touchmove', () => {
         window.touchMoved = true;
       });
       
-      document.touchEndInitialized = true;
+      document.touchHandlersInitialized = true;
     }
     
     // Add click event to select this persona
