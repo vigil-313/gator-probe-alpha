@@ -107,6 +107,36 @@ header h1 {
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
+.valugator-link {
+  color: white;
+  text-decoration: none;
+  position: relative;
+  display: inline-block;
+  transition: transform 0.3s ease;
+}
+
+.valugator-link:hover {
+  transform: scale(1.05);
+}
+
+.valugator-link::after {
+  content: '\f09b'; /* GitHub icon Unicode from Font Awesome */
+  font-family: 'Font Awesome 5 Brands', sans-serif;
+  position: absolute;
+  top: 5px;
+  right: -25px;
+  font-size: 0.7em;
+  opacity: 0.7;
+}
+
+/* Fallback for Font Awesome */
+@supports not (content: '\f09b') {
+  .valugator-link::after {
+    content: '[gh]';
+    font-size: 0.6em;
+  }
+}
+
 header p {
   opacity: 0.9;
   font-size: 1.1rem;
