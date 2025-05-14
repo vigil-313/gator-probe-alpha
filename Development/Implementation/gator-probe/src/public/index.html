@@ -9,44 +9,121 @@
 <body>
   <div class="container">
     <header>
-      <h1>VALUGATOR Probe Alpha</h1>
-      <p>Submit your startup idea for feedback from our AI gator personas</p>
+      <div class="header-graphics"></div>
+      <div class="logo-container">
+        <div class="logo">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+            <path d="M256 32c-88.004 0-160 70.557-160 156.801C96 306.4 256 480 256 480s160-173.6 160-291.199C416 102.557 344.004 32 256 32zm0 212.801c-31.996 0-57.144-24.645-57.144-56 0-31.357 25.147-56 57.144-56s57.144 24.643 57.144 56c0 31.355-25.148 56-57.144 56z"/>
+          </svg>
+        </div>
+        <h1>VALUGATOR</h1>
+      </div>
+      <p>Get expert feedback on your startup ideas from our AI gator personas</p>
     </header>
 
     <main>
-      <section class="persona-selector">
-        <h2>Select a Gator Persona</h2>
-        <div class="persona-options">
-          <!-- Persona options will be dynamically populated in future tasks -->
-          <select id="persona-select">
-            <option value="rex">Rex Revenue - The Business Expert</option>
-            <option value="tessa">Tessa Technical - The Tech Guru</option>
-            <option value="lex">Lex Legal - The Legal Advisor</option>
-          </select>
+      <div id="form-container">
+        <div class="tech-graphics"></div>
+        <div class="gator-graphics"></div>
+        
+        <div class="panel-selection">
+          <div class="panel-card" data-panel="evaluation">
+            <div class="panel-icon">🔍</div>
+            <h4>Evaluation Chamber</h4>
+            <p>Critical feedback on your idea</p>
+          </div>
+          <div class="panel-card" data-panel="pathfinder">
+            <div class="panel-icon">🧭</div>
+            <h4>Pathfinder Council</h4>
+            <p>Guidance and direction</p>
+          </div>
+          <div class="panel-card" data-panel="legal">
+            <div class="panel-icon">⚖️</div>
+            <h4>Legal Panel</h4>
+            <p>Legal risk assessment</p>
+          </div>
         </div>
-      </section>
 
-      <section class="idea-submission">
-        <h2>Your Startup Idea</h2>
         <form id="idea-form">
-          <textarea id="idea-input" rows="4" placeholder="Describe your startup idea..."></textarea>
-          <button type="submit" id="submit-button">Get Feedback</button>
-        </form>
-      </section>
+          <div class="form-group">
+            <label for="persona-select">Select a Gator <span class="required">*</span></label>
+            <div class="input-wrapper">
+              <select id="persona-select" required>
+                <option value="" selected disabled>Choose a gator persona...</option>
+                <!-- Will be populated dynamically -->
+              </select>
+            </div>
+            <div id="persona-info" class="hidden">
+              <!-- Will be populated dynamically -->
+            </div>
+          </div>
 
-      <section class="response-area">
-        <h2>Gator Feedback</h2>
-        <div id="gator-response" class="response-box">
-          <p class="placeholder">Submit your idea to see feedback here</p>
+          <div class="form-group">
+            <label for="idea-input">Your Startup Idea <span class="required">*</span></label>
+            <div class="input-wrapper">
+              <textarea id="idea-input" rows="5" placeholder="Describe your startup idea in detail..." required></textarea>
+            </div>
+            <div class="char-count">
+              <span id="char-counter">0</span>/2000 characters
+            </div>
+          </div>
+
+          <button type="submit" id="submit-button" class="gator-button">
+            <span class="icon">🐊</span> Get Gator Feedback
+          </button>
+        </form>
+      </div>
+
+      <div id="response-container" class="hidden">
+        <div class="response-header">
+          <h2 id="response-title">Gator Feedback</h2>
+          <div class="idea-summary">
+            <strong>Your idea:</strong> <span id="idea-summary"></span>
+          </div>
         </div>
-      </section>
+        
+        <div class="response-content">
+          <div class="persona-header">
+            <div class="persona-avatar" id="persona-avatar">G</div>
+            <div class="persona-info">
+              <h3 id="persona-name">Gator Persona</h3>
+              <p id="persona-description">Expert in evaluation</p>
+            </div>
+          </div>
+          
+          <div id="gator-response" class="response-box">
+            <!-- Response will be inserted here -->
+          </div>
+        </div>
+        
+        <div class="response-actions">
+          <button id="reset-button" class="secondary-button">Try Another Idea</button>
+          <button id="tech-info-button" class="tech-button">Tech Details</button>
+        </div>
+      </div>
+
+      <div id="loading-container" class="hidden">
+        <div class="loading-spinner"></div>
+        <p class="loading-text">Getting feedback from your chosen gator...</p>
+        <p class="loading-subtext">This usually takes 5-10 seconds</p>
+      </div>
+
+      <div id="error-container" class="hidden">
+        <div class="error-icon">⚠️</div>
+        <h3>Something went wrong</h3>
+        <p id="error-message">We couldn't process your request. Please try again later.</p>
+        <button id="error-reset-button">Try Again</button>
+      </div>
     </main>
 
     <footer>
       <p>VALUGATOR Probe Alpha v0.1.0 | For demonstration purposes only</p>
+      <div class="tech-footer">
+        <p>Powered by advanced AI technology and node.js</p>
+      </div>
     </footer>
   </div>
 
-  <script src="js/main.js"></script>
+  <script src="js/app.js"></script>
 </body>
 </html>

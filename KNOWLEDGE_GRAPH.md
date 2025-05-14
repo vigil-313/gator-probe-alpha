@@ -43,9 +43,9 @@
   - Related: [CON-PROBE-002], [CON-PROBE-005], [CON-PROBE-011], [CON-PROBE-020], [CON-PROBE-021]
   - Documents: [DOC-TECH-API-1], [DOC-TECH-EXT-1]
 
-- [CON-PROBE-005]: Minimal User Interface
-  - Definition: Simple HTML form for pitch submission and response display
-  - Related: [CON-PROBE-004]
+- [CON-PROBE-005]: Enhanced User Interface
+  - Definition: Responsive design with panel-based navigation, themed UI elements, and simulation mode
+  - Related: [CON-PROBE-004], [CON-PROBE-028], [CON-PROBE-029], [CON-PROBE-030]
   - Documents: [DOC-TECH-UI-1]
 
 - [CON-PROBE-006]: Evaluation Chamber
@@ -158,6 +158,56 @@
   - Related: [CON-PROBE-014], [CON-PROBE-018], [CON-PROBE-023]
   - Documents: [DOC-DEV-TEST-1]
 
+- [CON-PROBE-028]: Panel-Based Navigation System
+  - Definition: UI organization approach that groups personas by panel type with visual differentiation and themed elements
+  - Related: [CON-PROBE-005], [CON-PROBE-029], [CON-PROBE-006], [CON-PROBE-007], [CON-PROBE-008]
+  - Documents: [DOC-TECH-UI-1]
+
+- [CON-PROBE-029]: Dynamic UI Theming
+  - Definition: System that changes UI colors and styling based on selected panel type using CSS variables
+  - Related: [CON-PROBE-005], [CON-PROBE-028], [CON-PROBE-030]
+  - Documents: [DOC-TECH-UI-1]
+
+- [CON-PROBE-030]: Simulation Mode
+  - Definition: Frontend feature that simulates API responses for demonstration without requiring backend connection
+  - Related: [CON-PROBE-005], [CON-PROBE-031]
+  - Documents: [DOC-TECH-UI-1]
+
+- [CON-PROBE-031]: Frontend Error Handling Strategy
+  - Definition: Comprehensive approach to handling UI errors with element existence checks and graceful degradation
+  - Related: [CON-PROBE-005], [CON-PROBE-030]
+  - Documents: [DOC-TECH-UI-1]
+
+- [CON-PROBE-032]: Real API Integration
+  - Definition: System for connecting to actual Claude API with proper authentication and response handling
+  - Related: [CON-PROBE-004], [CON-PROBE-020], [CON-PROBE-033]
+  - Documents: [DOC-TECH-API-1]
+
+- [CON-PROBE-033]: Environment-based Configuration
+  - Definition: System for managing sensitive configuration values like API keys via environment variables
+  - Related: [CON-PROBE-032], [CON-PROBE-034]
+  - Documents: [DOC-TECH-API-1]
+
+- [CON-PROBE-034]: Operation Mode Toggle
+  - Definition: Configuration system that allows switching between simulation and real API modes
+  - Related: [CON-PROBE-030], [CON-PROBE-032], [CON-PROBE-033]
+  - Documents: [DOC-TECH-API-1]
+
+- [CON-PROBE-035]: User Testing Framework
+  - Definition: Structured approach to conducting end-to-end user testing with real users
+  - Related: [CON-PROBE-032], [CON-PROBE-036]
+  - Documents: [DOC-DEV-TEST-1]
+
+- [CON-PROBE-036]: Feedback Capture System
+  - Definition: Mechanisms for collecting and analyzing user feedback during testing
+  - Related: [CON-PROBE-035], [CON-PROBE-037]
+  - Documents: [DOC-DEV-TEST-1]
+
+- [CON-PROBE-037]: User Experience Optimization
+  - Definition: Process for making adjustments based on user testing feedback
+  - Related: [CON-PROBE-035], [CON-PROBE-036]
+  - Documents: [DOC-TECH-UI-1]
+
 ## System Relationships
 1. [CON-SYS-001] → implements → [CON-SYS-002]
 2. [CON-SYS-001] → organizes by → [CON-SYS-003]
@@ -208,6 +258,29 @@
 41. [CON-PROBE-026] → handles → [CON-PROBE-017], [CON-PROBE-022] error types
 42. [CON-PROBE-027] → enhances → server testing isolation
 43. [CON-PROBE-027] → improves upon → [CON-PROBE-014], [CON-PROBE-018]
+44. [CON-PROBE-028] → organizes → UI by panel type
+45. [CON-PROBE-028] → enhances → user experience with visual distinctions
+46. [CON-PROBE-028] → enables → [CON-PROBE-029] theme switching
+47. [CON-PROBE-029] → applies → dynamic styling based on selected panel
+48. [CON-PROBE-029] → uses → CSS variables for consistent theming
+49. [CON-PROBE-030] → enables → demonstration without backend dependency
+50. [CON-PROBE-030] → simulates → API response generation
+51. [CON-PROBE-031] → prevents → null reference errors
+52. [CON-PROBE-031] → improves → user experience with graceful degradation
+53. [CON-PROBE-031] → handles → missing DOM elements
+54. [CON-PROBE-032] → replaces → [CON-PROBE-030] simulation mode
+55. [CON-PROBE-032] → connects to → real Claude API service
+56. [CON-PROBE-032] → requires → [CON-PROBE-033] for API keys
+57. [CON-PROBE-033] → secures → sensitive configuration data
+58. [CON-PROBE-033] → implements → environment variable pattern
+59. [CON-PROBE-034] → enables → switching between real and simulated modes
+60. [CON-PROBE-034] → facilitates → testing without API costs
+61. [CON-PROBE-035] → validates → system with real users
+62. [CON-PROBE-035] → utilizes → [CON-PROBE-036] for feedback
+63. [CON-PROBE-036] → captures → user experience issues
+64. [CON-PROBE-036] → informs → [CON-PROBE-037] adjustments
+65. [CON-PROBE-037] → improves → system based on user feedback
+66. [CON-PROBE-037] → finalizes → system for production
 
 ## Visual Representation
 ### Documentation System
@@ -406,4 +479,4 @@ Documentation System
 ```
 
 ## Last Updated
-2025-05-17T10:00:00Z | SESSION-012 | Claude
+2025-05-18T15:45:00Z | SESSION-013 | Claude
