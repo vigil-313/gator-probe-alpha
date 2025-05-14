@@ -76,14 +76,28 @@ export class LlmClient {
       const settings = await this.configLoader.loadSettings();
       const apiSettings = settings.apiSettings || {};
       
+      // Log simulation mode value for debugging
+      console.log(`[LlmClient] Env USE_SIMULATION_MODE: ${process.env.USE_SIMULATION_MODE}`);
+      console.log(`[LlmClient] Settings useSimulationMode: ${apiSettings.useSimulationMode}`);
+      
+      // Calculate final simulation mode value
+      const useSimMode = apiSettings.useSimulationMode !== undefined ? 
+        apiSettings.useSimulationMode : 
+        (process.env.USE_SIMULATION_MODE === 'true');
+      
+      console.log(`[LlmClient] Final useSimulationMode: ${useSimMode}`);
+      
+      // Prioritize environment variables, then fall back to settings
       return this.initializeProvider(
         apiSettings.provider,
         {
-          apiKey: process.env.LLM_API_KEY || apiSettings.apiKey,
+          apiKey: process.env.CLAUDE_API_KEY || process.env.LLM_API_KEY || apiSettings.apiKey,
           apiVersion: apiSettings.apiVersion,
           model: apiSettings.model,
           temperature: apiSettings.temperature,
-          maxTokens: apiSettings.maxTokens
+          maxTokens: apiSettings.maxTokens,
+          baseUrl: apiSettings.baseUrl || "https://api.anthropic.com/v1",
+          useSimulationMode: useSimMode
         }
       );
     } catch (error) {

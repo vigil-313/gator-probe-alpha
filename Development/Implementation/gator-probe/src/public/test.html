@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>JavaScript Test</title>
+</head>
+<body>
+  <h1>JavaScript Test Page</h1>
+  <button id="test-button">Click Me</button>
+
+  <script>
+    // Immediate log on page load
+    console.log('BASIC TEST PAGE LOADED');
+    alert('Test page loaded');
+    
+    // Button click handler
+    document.getElementById('test-button').addEventListener('click', function() {
+      console.log('BUTTON CLICKED');
+      alert('Button clicked!');
+    });
+  </script>
+</body>
+</html>

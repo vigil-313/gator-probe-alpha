@@ -327,14 +327,19 @@ export class ConfigLoader {
    * @returns {Object} Default settings
    */
   _getDefaultSettings() {
+    // Get values from environment variables or use defaults
+    const useSimulationMode = process.env.USE_SIMULATION_MODE === 'true';
+    
     return {
       defaultGator: "rex",
       apiSettings: {
         provider: "claude",
-        apiVersion: "2023-08-31",
-        model: "claude-3-sonnet-20240229",
-        temperature: 0.7,
-        maxTokens: 1500
+        apiVersion: process.env.CLAUDE_API_VERSION || "2023-08-31",
+        model: process.env.CLAUDE_MODEL || "claude-3-sonnet-20240229",
+        temperature: parseFloat(process.env.CLAUDE_TEMPERATURE) || 0.7,
+        maxTokens: parseInt(process.env.CLAUDE_MAX_TOKENS) || 1500,
+        useSimulationMode: useSimulationMode,
+        baseUrl: process.env.CLAUDE_API_BASE_URL || "https://api.anthropic.com/v1"
       },
       userInterface: {
         includeGatorSelection: true,

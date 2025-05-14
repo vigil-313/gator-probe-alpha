@@ -34,9 +34,10 @@ export class ClaudeProvider extends BaseProvider {
   validateConfig() {
     super.validateConfig();
     
-    if (!this.config.apiKey) {
+    // Allow missing API key in simulation mode
+    if (!this.config.useSimulationMode && !this.config.apiKey) {
       throw new ApiError(
-        'Claude API key is required',
+        'Claude API key is required when not in simulation mode',
         'MISSING_API_KEY'
       );
     }
@@ -77,13 +78,31 @@ export class ClaudeProvider extends BaseProvider {
         );
       }
       
+      // Log simulation mode status for debugging
+      console.log(`[ClaudeProvider] Simulation Mode: ${this.config.useSimulationMode ? 'ENABLED' : 'DISABLED'}`);
+      console.log(`[ClaudeProvider] API Key: ${this.config.apiKey ? 'Configured' : 'Missing'}`);
+      
+      // Force real API mode for testing
+      console.log('[ClaudeProvider] Config values:', JSON.stringify(this.config, null, 2));
+      
+      // Check if we're in simulation mode - force to false for testing
+      const forcedSimMode = false; // Set to false to force real API mode
+      if (forcedSimMode) {
+        console.log('[ClaudeProvider] Using simulation mode - generating simulated response');
+        return this._generateSimulatedResponse(systemPrompt, userPrompt);
+      }
+      
+      console.log('[ClaudeProvider] Using real API mode - sending request to Claude API');
+      
+      // Proceed with real API call
       // Prepare request payload according to Claude API format
+      // The current Claude API expects system prompt as a top-level parameter
       const payload = {
         model: this.config.model,
         temperature: options.temperature || this.config.temperature || 0.7,
         max_tokens: options.maxTokens || this.config.maxTokens || 1500,
+        system: systemPrompt,  // System prompt as top-level parameter
         messages: [
-          { role: 'system', content: systemPrompt },
           { role: 'user', content: userPrompt }
         ]
       };
@@ -92,7 +111,7 @@ export class ClaudeProvider extends BaseProvider {
       const headers = {
         'Content-Type': 'application/json',
         'x-api-key': this.config.apiKey,
-        'anthropic-version': this.config.apiVersion || '2023-06-01'
+        'anthropic-version': '2023-06-01'  // Current official version as of 2024
       };
       
       // Prepare request options
@@ -103,7 +122,7 @@ export class ClaudeProvider extends BaseProvider {
       };
       
       // Determine API endpoint
-      const apiUrl = 'https://api.anthropic.com/v1/messages';
+      const apiUrl = `${this.config.baseUrl || 'https://api.anthropic.com/v1'}/messages`;
       
       // Make the request
       const response = await fetch(apiUrl, requestOptions);
@@ -140,6 +159,50 @@ export class ClaudeProvider extends BaseProvider {
         { originalError: error.toString() }
       );
     }
+  }
+  
+  /**
+   * Generate a simulated response (for development/testing without API costs)
+   * @param {string} systemPrompt - System prompt
+   * @param {string} userPrompt - User prompt 
+   * @returns {Object} Simulated response object
+   * @private
+   */
+  _generateSimulatedResponse(systemPrompt, userPrompt) {
+    // Extract persona name or use a generic name
+    const personaMatch = systemPrompt.match(/My name is ([^,.]+)/);
+    const personaName = personaMatch ? personaMatch[1] : 'The Gator';
+    
+    // Extract the user input (usually a startup idea)
+    const idea = userPrompt.replace('Startup Idea:', '').trim();
+    
+    // Create a simulated response based on the persona and input
+    const responses = [
+      `As ${personaName}, I find this idea "${idea}" quite intriguing. The market potential seems promising, though I'd suggest focusing more on the unique value proposition. Consider how you'll differentiate from existing solutions.`,
+      `${personaName} here! I've analyzed your startup idea: "${idea}". The concept has merit, but I'm concerned about the execution challenges. Have you considered the regulatory hurdles and initial capital requirements?`,
+      `*adjusts glasses* Interesting proposal! "${idea}" targets a growing market, but your revenue model needs refinement. I recommend conducting thorough customer validation before proceeding further.`,
+      `From my perspective as ${personaName}, your idea "${idea}" shows promise. However, the competitive landscape is quite dense. You'll need a strong go-to-market strategy and clear differentiation to succeed.`,
+      `${personaName} analysis: "${idea}" - This concept addresses a real problem, which is excellent. I'd recommend focusing on building a minimum viable product quickly to test key assumptions before seeking funding.`
+    ];
+    
+    // Select a random response
+    const responseIndex = Math.floor(Math.random() * responses.length);
+    const content = responses[responseIndex];
+    
+    // Return a response object that mimics the real API response
+    return {
+      content: content,
+      model: 'claude-3-sonnet-20240229-simulation',
+      id: `sim_${Date.now().toString(36)}`,
+      usage: {
+        input_tokens: systemPrompt.length + userPrompt.length,
+        output_tokens: content.length
+      },
+      metadata: {
+        finishReason: 'end_turn',
+        simulatedResponse: true
+      }
+    };
   }
 
   /**

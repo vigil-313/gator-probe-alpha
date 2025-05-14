@@ -29,19 +29,22 @@ document.addEventListener('DOMContentLoaded', () => {
   /**
    * Submit idea to the API and display response
    * @param {string} idea - The startup idea
-   * @param {string} persona - The selected persona ID
+   * @param {string} personaId - The selected persona ID
    */
-  async function submitIdea(idea, persona) {
+  async function submitIdea(idea, personaId) {
     showMessage('Consulting with the gator...', 'loading');
     submitButton.disabled = true;
 
     try {
-      const response = await fetch('/api/gator', {
+      const response = await fetch('/api/generate', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ idea, persona }),
+        body: JSON.stringify({ 
+          personaId, 
+          userInput: idea 
+        }),
       });
 
       if (!response.ok) {
@@ -50,10 +53,23 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       const data = await response.json();
-      showMessage(data.response || 'No response received', 'success');
+      console.log('API response:', data);
+      
+      if (data && data.status === 'success' && data.data) {
+        // Handle the response based on the format
+        if (data.data.response) {
+          showMessage(data.data.response, 'success');
+        } else if (data.data.content) {
+          showMessage(data.data.content, 'success');
+        } else {
+          throw new Error('Response missing content');
+        }
+      } else {
+        throw new Error('Invalid response format');
+      }
     } catch (error) {
       showMessage(
-        'This feature is not yet implemented. Stay tuned for future updates!',
+        `Error: ${error.message || 'Something went wrong. Please try again.'}`,
         'error'
       );
       console.error('Error:', error);

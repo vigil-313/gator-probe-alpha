@@ -3,6 +3,9 @@
  * Enhanced frontend application script with visual improvements
  */
 
+// Log when app.js loads
+console.log('APP.JS LOADED - Development version');
+
 document.addEventListener('DOMContentLoaded', () => {
   // DOM elements - Form
   const ideaForm = document.getElementById('idea-form');
@@ -106,11 +109,11 @@ document.addEventListener('DOMContentLoaded', () => {
       
       // Simulate API data for demo purposes if server isn't returning data
       // Comment out this line if connecting to a real backend
-      simulateApiData();
+      // simulateApiData();
       
       // Fetch personas from API - enable this when backend is ready
       // Comment out this line if using simulated data
-      // await loadPersonas();
+      await loadPersonas();
     } catch (error) {
       console.error('Initialization error:', error);
       showError('Failed to initialize application. Please refresh the page.', error);
@@ -450,6 +453,12 @@ document.addEventListener('DOMContentLoaded', () => {
    * @param {Event} event - The submit event
    */
   async function handleSubmit(event) {
+    // Log form submission
+    console.log('Form submitted with:', {
+      personaId: personaSelect.value,
+      userInput: ideaInput.value.trim()
+    });
+    
     event.preventDefault();
     
     // Validate form
@@ -465,29 +474,33 @@ document.addEventListener('DOMContentLoaded', () => {
     showLoading(true);
     
     try {
+      // Comment out simulation for real API integration
       // For demonstration purposes - simulate API call with a timeout
-      // Remove this and uncomment the fetch below when connecting to a real backend
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      // await new Promise(resolve => setTimeout(resolve, 2000));
+      // 
+      // const simulatedResponse = {
+      //   status: 'success',
+      //   data: {
+      //     personaId,
+      //     response: generateSimulatedResponse(personaId, userInput),
+      //     metadata: {
+      //       model: 'claude-3-sonnet-20240229',
+      //       usage: {
+      //         input_tokens: 250,
+      //         output_tokens: 450
+      //       }
+      //     }
+      //   }
+      // };
+      // 
+      // displayResponse(simulatedResponse.data, userInput);
       
-      const simulatedResponse = {
-        status: 'success',
-        data: {
-          personaId,
-          response: generateSimulatedResponse(personaId, userInput),
-          metadata: {
-            model: 'claude-3-sonnet-20240229',
-            usage: {
-              input_tokens: 250,
-              output_tokens: 450
-            }
-          }
-        }
-      };
+      // Real API integration
+      console.log('Sending request to API:', {
+        personaId,
+        userInput
+      });
       
-      displayResponse(simulatedResponse.data, userInput);
-      
-      // Uncomment this for actual API integration
-      /* 
       // Send request to API
       const response = await fetch('/api/generate', {
         method: 'POST',
@@ -508,6 +521,7 @@ document.addEventListener('DOMContentLoaded', () => {
       
       // Process response
       const data = await response.json();
+      console.log('API response:', data);
       
       if (!data.status || data.status !== 'success') {
         throw new Error(data.message || 'Failed to generate response');
@@ -515,7 +529,6 @@ document.addEventListener('DOMContentLoaded', () => {
       
       // Display the response
       displayResponse(data.data, userInput);
-      */
     } catch (error) {
       showError('Failed to get gator feedback. Please try again.', error);
     } finally {
@@ -624,7 +637,16 @@ DISCLAIMER: This analysis is for informational purposes only and does not consti
       personaDescription.textContent = '';
     }
     
-    gatorResponse.textContent = data.response;
+    // Handle either response or content field
+    if (data.content) {
+      gatorResponse.textContent = data.content;
+    } else if (data.response) {
+      gatorResponse.textContent = data.response;
+    } else {
+      gatorResponse.textContent = "No response content available";
+    }
+    
+    console.log('Response data to display:', data);
     
     // Scroll to response
     responseContainer.scrollIntoView({ behavior: 'smooth' });

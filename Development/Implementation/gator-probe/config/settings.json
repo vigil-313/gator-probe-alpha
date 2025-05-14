@@ -1,0 +1,25 @@
+{
+  "defaultGator": "rex",
+  "apiSettings": {
+    "provider": "claude",
+    "apiVersion": "2023-06-01",
+    "model": "claude-3-7-sonnet-20250219",
+    "temperature": 0.7,
+    "maxTokens": 1500
+  },
+  "userInterface": {
+    "includeGatorSelection": true,
+    "displayGatorAttributes": false,
+    "showResponseMetadata": false
+  },
+  "promptSettings": {
+    "includeVisualDescription": true,
+    "maxInputLength": 2000,
+    "systemPromptTemplate": "config/prompt-templates/evaluation.json"
+  },
+  "validationSettings": {
+    "logResponses": true,
+    "trackToneConsistency": true,
+    "validatePersonaAdherence": true
+  }
+}

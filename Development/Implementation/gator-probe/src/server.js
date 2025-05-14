@@ -107,12 +107,19 @@ app.post('/api/generate', validateRequest(validateGenerateRequest), async (req, 
       userPrompt: prompt.userPrompt
     });
     
+    // Log for debugging
+    console.log('[API] Response from LLM client:', {
+      content: response.content,
+      model: response.model,
+      usage: response.usage
+    });
+    
     // Return the response
     res.status(200).json({
       status: 'success',
       data: {
         personaId,
-        response: response.content,
+        content: response.content,
         metadata: {
           model: response.model,
           usage: response.usage
@@ -323,6 +330,10 @@ if (process.env.NODE_ENV !== 'test') {
   app.listen(PORT, () => {
     // eslint-disable-next-line no-console
     console.log(`VALUGATOR Probe Alpha server running on port ${PORT}`);
+    console.log(`Environment: ${process.env.NODE_ENV}`);
+    console.log(`Simulation Mode: ${process.env.USE_SIMULATION_MODE === 'true' ? 'ENABLED' : 'DISABLED'}`);
+    console.log(`API Base URL: ${process.env.CLAUDE_API_BASE_URL}`);
+    console.log(`API Key configured: ${process.env.CLAUDE_API_KEY ? 'YES' : 'NO'}`);
   });
 }
 
