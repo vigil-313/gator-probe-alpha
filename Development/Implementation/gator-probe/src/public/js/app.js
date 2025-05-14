@@ -9,12 +9,11 @@ console.log('APP.JS LOADED - Development version');
 document.addEventListener('DOMContentLoaded', () => {
   // DOM elements - Form
   const ideaForm = document.getElementById('idea-form');
-  const personaSelect = document.getElementById('persona-select');
   const personaInfo = document.getElementById('persona-info');
   const ideaInput = document.getElementById('idea-input');
   const charCounter = document.getElementById('char-counter');
   const submitButton = document.getElementById('submit-button');
-  const panelCards = document.querySelectorAll('.panel-card');
+  const personaContainer = document.querySelector('.all-personas-container');
   
   // DOM elements - Containers
   const formContainer = document.getElementById('form-container');
@@ -29,6 +28,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const personaDescription = document.getElementById('persona-description');
   const personaAvatar = document.getElementById('persona-avatar');
   const gatorResponse = document.getElementById('gator-response');
+  const selectPrompt = document.getElementById('select-prompt');
   
   // DOM elements - Buttons
   const resetButton = document.getElementById('reset-button');
@@ -39,7 +39,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const checkElements = () => {
     const required = {
       ideaForm,
-      personaSelect,
       personaInfo,
       ideaInput,
       charCounter,
@@ -114,6 +113,9 @@ document.addEventListener('DOMContentLoaded', () => {
       // Fetch personas from API - enable this when backend is ready
       // Comment out this line if using simulated data
       await loadPersonas();
+      
+      // Render persona tiles
+      renderPersonaTiles();
     } catch (error) {
       console.error('Initialization error:', error);
       showError('Failed to initialize application. Please refresh the page.', error);
@@ -127,18 +129,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // Form submission
     if (ideaForm) {
       ideaForm.addEventListener('submit', handleSubmit);
-    }
-    
-    // Panel selection
-    if (panelCards && panelCards.length > 0) {
-      panelCards.forEach(card => {
-        card.addEventListener('click', handlePanelClick);
-      });
-    }
-    
-    // Persona selection changes
-    if (personaSelect) {
-      personaSelect.addEventListener('change', handlePersonaChange);
     }
     
     // Character count
@@ -162,29 +152,219 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   /**
-   * Handle panel card click
-   * @param {Event} event - The click event
+   * Render all persona tiles in one container
    */
-  function handlePanelClick(event) {
-    const card = event.currentTarget;
-    const panel = card.dataset.panel;
+  function renderPersonaTiles() {
+    // Get the container for all personas
+    const container = document.querySelector('.all-personas-container');
     
-    // Update active panel
-    panelCards.forEach(c => c.classList.remove('active'));
-    card.classList.add('active');
+    if (!container) {
+      console.error('Persona container not found');
+      return;
+    }
     
-    // Store selected panel
-    selectedPanel = panel;
+    if (!panels || Object.keys(panels).length === 0) {
+      console.error('No panels data available for rendering tiles');
+      return;
+    }
+    
+    // Clear loading message
+    container.innerHTML = '';
+    
+    // For each panel type, add its personas to the container
+    Object.keys(panels).forEach(panelType => {
+      const panelData = panels[panelType];
+      
+      if (!panelData || !panelData.personas || panelData.personas.length === 0) {
+        return; // Skip empty panels
+      }
+      
+      // Create persona tiles for this panel
+      panelData.personas.forEach(persona => {
+        const tile = createPersonaTile(persona, panelType);
+        container.appendChild(tile);
+      });
+    });
+  }
+  
+  /**
+   * Create a persona tile element
+   * @param {Object} persona - The persona data
+   * @param {string} panelType - The panel type
+   * @returns {HTMLElement} - The persona tile element
+   */
+  function createPersonaTile(persona, panelType) {
+    const tile = document.createElement('div');
+    tile.className = `persona-tile ${panelType}`;
+    tile.dataset.personaId = persona.id;
+    tile.dataset.panel = panelType;
+    
+    // Get first letter for avatar
+    const avatarLetter = persona.name.charAt(0);
+    
+    // Get a short name that respects titles like 'Dr.'
+    let shortName;
+    if (persona.name.startsWith('Dr.')) {
+      // For doctors, keep title + first name
+      const nameParts = persona.name.split(' ');
+      shortName = nameParts.length >= 2 ? `${nameParts[0]} ${nameParts[1]}` : persona.name;
+    } else {
+      // Otherwise just first name
+      shortName = persona.name.split(' ')[0];
+    }
+    
+    // Create minimal tile content without the popup
+    tile.innerHTML = `
+      <div class="persona-avatar">${avatarLetter}</div>
+      <h5>${shortName}</h5>
+    `;
+    
+    // Parse expertise into tags if it's a string
+    let expertiseTags = [];
+    if (typeof persona.expertise === 'string') {
+      expertiseTags = persona.expertise.split(',').map(tag => tag.trim());
+    } else if (Array.isArray(persona.expertise)) {
+      expertiseTags = persona.expertise;
+    }
+    
+    // Add event handlers for hover
+    tile.addEventListener('mouseenter', () => {
+      // Create popup if doesn't exist
+      showPersonaPopup(persona, panelType, expertiseTags, tile);
+    });
+    
+    tile.addEventListener('mouseleave', () => {
+      // Remove popup when mouse leaves
+      hidePersonaPopup();
+    });
+    
+    // Add click event to select this persona
+    tile.addEventListener('click', () => handlePersonaTileClick(tile, persona, panelType));
+    
+    return tile;
+  }
+  
+  /**
+   * Show a popup for a persona
+   * @param {Object} persona - The persona data
+   * @param {string} panelType - The panel type
+   * @param {Array} expertiseTags - The expertise tags
+   * @param {HTMLElement} tile - The tile element
+   */
+  function showPersonaPopup(persona, panelType, expertiseTags, tile) {
+    // Remove any existing popup
+    hidePersonaPopup();
+    
+    // Create the popup
+    const popup = document.createElement('div');
+    popup.id = 'persona-popup';
+    popup.className = 'persona-popup';
+    
+    // Add content to the popup
+    popup.innerHTML = `
+      <div class="detail-panel-type ${panelType}">${getPanelDisplayName(panelType)}</div>
+      <h6>${persona.name} ${persona.nickname ? `"${persona.nickname}"` : ''}</h6>
+      <div class="detail-archetype">${persona.archetype || 'Gator Persona'}</div>
+      <p>${persona.briefDescription || ''}</p>
+      <h6>Expertise</h6>
+      <div class="expertise-tags">
+        ${expertiseTags.slice(0, 5).map(tag => `<span class="expertise-tag">${tag}</span>`).join('')}
+        ${expertiseTags.length > 5 ? `<span class="expertise-tag">+${expertiseTags.length - 5} more</span>` : ''}
+      </div>
+    `;
+    
+    // Append to body (not inside the container)
+    document.body.appendChild(popup);
+    
+    // Position the popup near the tile, but check if it would go off-screen
+    const tileRect = tile.getBoundingClientRect();
+    const viewportWidth = window.innerWidth;
+    const viewportHeight = window.innerHeight;
+    const popupWidth = 250;
+    
+    popup.style.position = 'fixed';
+    
+    // Check if there's more space above or below
+    if (tileRect.bottom + 300 > viewportHeight && tileRect.top > 300) {
+      // Position above
+      popup.style.bottom = (viewportHeight - tileRect.top + 10) + 'px';
+      popup.style.top = 'auto';
+      // Move arrow to bottom
+      popup.classList.add('arrow-bottom');
+    } else {
+      // Position below
+      popup.style.top = (tileRect.bottom + 10) + 'px';
+      popup.style.bottom = 'auto';
+    }
+    
+    // Center horizontally, but don't go off-screen
+    let leftPos = tileRect.left + (tileRect.width / 2) - (popupWidth / 2);
+    if (leftPos < 10) leftPos = 10;
+    if (leftPos + popupWidth > viewportWidth - 10) leftPos = viewportWidth - popupWidth - 10;
+    
+    popup.style.left = leftPos + 'px';
+    
+    // Set a fixed width
+    popup.style.width = '250px';
+  }
+  
+  /**
+   * Hide the persona popup
+   */
+  function hidePersonaPopup() {
+    const popup = document.getElementById('persona-popup');
+    if (popup) {
+      popup.remove();
+    }
+  }
+  
+  /**
+   * Handle click on a persona tile
+   * @param {HTMLElement} tile - The persona tile element
+   * @param {Object} persona - The persona data
+   * @param {string} panelType - The panel type
+   */
+  function handlePersonaTileClick(tile, persona, panelType) {
+    // Deselect all other tiles
+    document.querySelectorAll('.persona-tile').forEach(t => {
+      t.classList.remove('selected');
+    });
+    
+    // Select this tile
+    tile.classList.add('selected');
+    
+    // Store selected persona and panel
+    selectedPersona = persona;
+    selectedPanel = panelType;
     
     // Update theme based on panel
-    updateThemeForPanel(panel);
+    updateThemeForPanel(panelType);
     
-    // Populate persona dropdown based on selected panel
-    populatePersonaSelect(panel);
+    // Display persona info
+    displayPersonaInfo(persona);
     
-    // Reset persona info
-    personaInfo.classList.add('hidden');
-    personaInfo.innerHTML = '';
+    // Enable submit button and hide prompt
+    submitButton.disabled = false;
+    document.getElementById('select-prompt').style.display = 'none';
+  }
+  
+  /**
+   * Update UI theme based on selected panel
+   * @param {string} panel - The selected panel type
+   */
+  /**
+   * Get display name for panel type
+   * @param {string} panelType - The panel type
+   * @returns {string} The display name
+   */
+  function getPanelDisplayName(panelType) {
+    const displayNames = {
+      'evaluation': 'Evaluation Chamber',
+      'pathfinder': 'Pathfinder Council',
+      'legal': 'Legal Panel'
+    };
+    
+    return displayNames[panelType] || panelType.charAt(0).toUpperCase() + panelType.slice(1);
   }
   
   /**
@@ -407,21 +587,32 @@ document.addEventListener('DOMContentLoaded', () => {
    * @param {Object} persona - The selected persona
    */
   function displayPersonaInfo(persona) {
+    if (!persona) {
+      personaInfo.classList.add('hidden');
+      return;
+    }
+
     const colors = panelColors[selectedPanel] || panelColors.evaluation;
     const firstLetter = persona.name.charAt(0);
     
+    // Show the info box
     personaInfo.innerHTML = `
-      <div class="persona-header">
-        <div class="persona-avatar" style="background-color: ${colors.primary}">
+      <div class="selected-persona-header">
+        <div class="selected-persona-avatar" style="background-color: ${colors.primary}">
           ${firstLetter}
         </div>
-        <div class="persona-details">
-          <h4>${persona.name}${persona.nickname ? ` "${persona.nickname}"` : ''}</h4>
-          <p>${persona.archetype || 'Gator Persona'}</p>
+        <div class="selected-persona-details">
+          <div class="selected-persona-name">${persona.name}</div>
+          ${persona.nickname ? `<div class="selected-persona-nickname">${persona.nickname}</div>` : ''}
+          <div class="selected-persona-archetype">${persona.archetype || 'Gator Persona'}</div>
         </div>
       </div>
-      <p>${persona.briefDescription || ''}</p>
-      <p><strong>Expertise:</strong> ${persona.expertise || 'Various fields'}</p>
+      <div class="selected-persona-description">
+        <p>${persona.briefDescription || ''}</p>
+        <div class="selected-persona-expertise">
+          <strong>Expertise:</strong> ${persona.expertise || 'Various fields'}
+        </div>
+      </div>
       <div class="persona-tags">
         ${persona.tone ? `<span class="tag">Tone: ${persona.tone}</span>` : ''}
         <span class="tag">${selectedPanel}</span>
@@ -520,7 +711,7 @@ document.addEventListener('DOMContentLoaded', () => {
   async function handleSubmit(event) {
     // Log form submission
     console.log('Form submitted with:', {
-      personaId: personaSelect.value,
+      personaId: selectedPersona.id,
       userInput: ideaInput.value.trim()
     });
     
@@ -532,7 +723,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     // Get form data
-    const personaId = personaSelect.value;
+    const personaId = selectedPersona.id;
     const userInput = ideaInput.value.trim();
     
     // Show loading state
@@ -639,15 +830,9 @@ DISCLAIMER: This analysis is for informational purposes only and does not consti
    * @returns {boolean} - True if form is valid
    */
   function validateForm() {
-    // Validate panel selection
-    if (!selectedPanel) {
-      showError('Please select a gator panel');
-      return false;
-    }
-    
-    // Validate persona selection
-    if (!personaSelect.value) {
-      showError('Please select a gator persona');
+    // Validate persona selection (now done via tiles)
+    if (!selectedPersona) {
+      showError('Please select a Valugator persona');
       return false;
     }
     
@@ -674,7 +859,7 @@ DISCLAIMER: This analysis is for informational purposes only and does not consti
   }
 
   /**
-   * Display the gator response
+   * Display the response
    * @param {Object} data - Response data from API
    * @param {string} userInput - The original user input
    */
@@ -685,28 +870,24 @@ DISCLAIMER: This analysis is for informational purposes only and does not consti
     responseContainer.classList.remove('hidden');
     
     // Set response content
-    const persona = personas[data.personaId];
     const truncatedInput = userInput.length > 100 
       ? userInput.substring(0, 100) + '...'
       : userInput;
     
     const colors = panelColors[selectedPanel] || panelColors.evaluation;
-    const firstLetter = persona?.name.charAt(0) || colors.avatar;
+    const firstLetter = selectedPersona.name.charAt(0);
     
-    responseTitle.textContent = `${selectedPanel.charAt(0).toUpperCase()}${selectedPanel.slice(1)} Feedback`;
+    responseTitle.textContent = `${getPanelDisplayName(selectedPanel)} Feedback`;
     ideaSummary.textContent = truncatedInput;
     
     // Set persona avatar with panel color
     personaAvatar.style.backgroundColor = colors.primary;
     personaAvatar.textContent = firstLetter;
     
-    if (persona) {
-      personaName.textContent = `${persona.name}${persona.nickname ? ` "${persona.nickname}"` : ''}`;
-      personaDescription.textContent = persona.briefDescription || persona.archetype || '';
-    } else {
-      personaName.textContent = data.personaId;
-      personaDescription.textContent = '';
-    }
+    // Use selectedPersona which we know is valid
+    personaName.textContent = `${selectedPersona.name}${selectedPersona.nickname ? ` "${selectedPersona.nickname}"` : ''}`;
+    personaDescription.textContent = selectedPersona.briefDescription || selectedPersona.archetype || '';
+    
     
     // Clear the response area first
     gatorResponse.innerHTML = '';
@@ -777,7 +958,7 @@ DISCLAIMER: This analysis is for informational purposes only and does not consti
    * This is a placeholder for additional features
    */
   function showTechInfo() {
-    alert('Technical Details:\n\nThis response was processed by the VALUGATOR system using artificial intelligence to provide character-based startup feedback. The system includes configuration loading, prompt assembly, and LLM API communication components working together to generate contextually relevant responses.');
+    alert('Technical Details:\n\nThis response was processed by the VALUGATOR system using artificial intelligence to provide character-based startup feedback from specialized Valugator personas. The system includes configuration loading, prompt assembly, and LLM API communication components working together to generate contextually relevant responses.');
   }
 
   /**
@@ -847,6 +1028,17 @@ DISCLAIMER: This analysis is for informational purposes only and does not consti
     personaInfo.classList.add('hidden');
     personaInfo.innerHTML = '';
     
-    // Keep the panel selection active
+    // Disable submit button and show prompt
+    submitButton.disabled = true;
+    selectPrompt.style.display = '';
+    
+    // Deselect all tiles
+    document.querySelectorAll('.persona-tile').forEach(t => {
+      t.classList.remove('selected');
+    });
+    
+    // Reset selected persona
+    selectedPersona = null;
+    selectedPanel = null;
   }
 });

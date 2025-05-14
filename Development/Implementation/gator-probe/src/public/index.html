@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>VALUGATOR Probe Alpha</title>
+  <title>VALUGATOR</title>
   <link rel="stylesheet" href="css/styles.css">
   <link rel="stylesheet" href="css/token-usage.css">
 </head>
@@ -19,7 +19,7 @@
         </div>
         <h1>VALUGATOR</h1>
       </div>
-      <p>Getttt expert feedback on your startup ideas from our AI gator personas</p>
+      <p>Get expert feedback on your ideas or projects from our AI Valugator personas</p>
     </header>
 
     <main>
@@ -27,57 +27,52 @@
         <div class="tech-graphics"></div>
         <div class="gator-graphics"></div>
         
-        <div class="panel-selection">
-          <div class="panel-card" data-panel="evaluation">
-            <div class="panel-icon">🔍</div>
-            <h4>Evaluation Chamber</h4>
-            <p>Critical feedback on your idea</p>
-          </div>
-          <div class="panel-card" data-panel="pathfinder">
-            <div class="panel-icon">🧭</div>
-            <h4>Pathfinder Council</h4>
-            <p>Guidance and direction</p>
-          </div>
-          <div class="panel-card" data-panel="legal">
-            <div class="panel-icon">⚖️</div>
-            <h4>Legal Panel</h4>
-            <p>Legal risk assessment</p>
-          </div>
-        </div>
-
         <form id="idea-form">
           <div class="form-group">
-            <label for="persona-select">Select a Gator <span class="required">*</span></label>
-            <div class="input-wrapper">
-              <select id="persona-select" required>
-                <option value="" selected disabled>Choose a gator persona...</option>
-                <!-- Will be populated dynamically -->
-              </select>
+            <label>Select a Valugator Persona <span class="required">*</span></label>
+            
+            <div class="gator-selection">
+              <div class="selection-info">
+                <div class="panel-legend">
+                  <span class="legend-item evaluation"><span class="dot"></span> Evaluation</span>
+                  <span class="legend-item pathfinder"><span class="dot"></span> Pathfinder</span>
+                  <span class="legend-item legal"><span class="dot"></span> Legal</span>
+                </div>
+              </div>
+              
+              <div class="all-personas-container">
+                <!-- Will be populated dynamically with all personas -->
+                <div class="loading-personas">Loading personas...</div>
+              </div>
             </div>
+            </div>
+            
+            <!-- Selected persona info will show here -->
             <div id="persona-info" class="hidden">
               <!-- Will be populated dynamically -->
             </div>
           </div>
 
           <div class="form-group">
-            <label for="idea-input">Your Startup Idea <span class="required">*</span></label>
+            <label for="idea-input">Your Idea <span class="required">*</span></label>
             <div class="input-wrapper">
-              <textarea id="idea-input" rows="5" placeholder="Describe your startup idea in detail..." required></textarea>
+              <textarea id="idea-input" rows="5" placeholder="Describe your idea or project in detail..." required></textarea>
             </div>
             <div class="char-count">
               <span id="char-counter">0</span>/<span id="char-limit">7000</span> characters
             </div>
           </div>
 
-          <button type="submit" id="submit-button" class="gator-button">
-            <span class="icon">🐊</span> Get Gator Feedback
+          <button type="submit" id="submit-button" class="gator-button" disabled>
+            <span class="icon">🐊</span> Get Valugator Feedback
           </button>
+          <p id="select-prompt" class="select-valugator-prompt">Please select a Valugator to continue</p>
         </form>
       </div>
 
       <div id="response-container" class="hidden">
         <div class="response-header">
-          <h2 id="response-title">Gator Feedback</h2>
+          <h2 id="response-title">Valugator Feedback</h2>
           <div class="idea-summary">
             <strong>Your idea:</strong> <span id="idea-summary"></span>
           </div>
@@ -87,8 +82,8 @@
           <div class="persona-header">
             <div class="persona-avatar" id="persona-avatar">G</div>
             <div class="persona-info">
-              <h3 id="persona-name">Gator Persona</h3>
-              <p id="persona-description">Expert in evaluation</p>
+              <h3 id="persona-name">Valugator Persona</h3>
+              <p id="persona-description">Expert feedback</p>
             </div>
           </div>
           
@@ -105,7 +100,7 @@
 
       <div id="loading-container" class="hidden">
         <div class="loading-spinner"></div>
-        <p class="loading-text">Getting feedback from your chosen gator...</p>
+        <p class="loading-text">Getting feedback from your chosen Valugator...</p>
         <p class="loading-subtext">This usually takes 5-10 seconds</p>
       </div>
 
@@ -118,7 +113,7 @@
     </main>
 
     <footer>
-      <p>VALUGATOR Probe Alpha v0.1.0 | For demonstration purposes only</p>
+      <p>VALUGATOR v0.1.0 | For demonstration purposes only</p>
       <div class="tech-footer">
         <p>Powered by advanced AI technology and node.js</p>
       </div>
