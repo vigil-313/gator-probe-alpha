@@ -251,6 +251,9 @@ main {
   box-shadow: var(--shadow);
   max-height: 170px;
   overflow-y: auto;
+  -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+  overscroll-behavior: contain; /* Prevent scroll chaining */
+  touch-action: pan-y; /* Allow vertical scrolling on touch devices */
 }
 
 /* Loading indicator for personas */
@@ -354,6 +357,8 @@ main {
   pointer-events: auto; /* Changed to allow interaction on mobile */
   border: 1px solid rgba(0,0,0,0.1);
   animation: fadeIn 0.15s ease-in;
+  overscroll-behavior: contain; /* Prevent scroll chaining */
+  -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
 }
 
 /* Close button for mobile */
@@ -520,6 +525,24 @@ main {
     max-width: 85vw; /* Limit width on mobile */
     width: auto !important; /* Override inline style */
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    padding: 18px; /* Larger padding for easier touch interaction */
+  }
+  
+  /* Increase touch target sizes on popup content */
+  .persona-popup h6 {
+    margin-top: 12px;
+    font-size: 16px;
+  }
+  
+  .persona-popup p {
+    font-size: 14px;
+    line-height: 1.5;
+  }
+  
+  .persona-popup .expertise-tag {
+    padding: 5px 8px;
+    margin: 0 6px 6px 0;
+    font-size: 12px;
   }
   
   /* Make close button more prominent on mobile */

@@ -239,29 +239,55 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     
     // Add touch events for mobile devices
-    tile.addEventListener('touchstart', (e) => {
-      // Prevent default to avoid immediate click event
-      e.preventDefault();
-      // Check if popup is already shown
-      const existingPopup = document.getElementById('persona-popup');
-      if (existingPopup) {
-        // If already shown, hide it (acting like a toggle)
-        hidePersonaPopup();
-      } else {
-        // Otherwise show it
-        showPersonaPopup(persona, panelType, expertiseTags, tile);
+    tile.addEventListener('touchend', (e) => {
+      // Don't prevent default to allow scrolling
+      // Only handle if this is a tap, not a scroll
+      if (!window.touchMoved) {
+        // Check if popup is already shown
+        const existingPopup = document.getElementById('persona-popup');
+        if (existingPopup) {
+          // If already shown, hide it (acting like a toggle)
+          hidePersonaPopup();
+        } else {
+          // Otherwise show it
+          showPersonaPopup(persona, panelType, expertiseTags, tile);
+        }
+        // Prevent click event from firing
+        e.preventDefault();
       }
+    });
+    
+    // Track touch movement for scroll detection
+    tile.addEventListener('touchstart', () => {
+      window.touchMoved = false;
+    });
+    
+    tile.addEventListener('touchmove', () => {
+      window.touchMoved = true;
     });
     
     // Add touch event to document to dismiss popup when touching elsewhere
     if (!document.touchEndInitialized) {
-      document.addEventListener('touchstart', (e) => {
-        // Check if we have a popup and the touch wasn't on a tile
-        const popup = document.getElementById('persona-popup');
-        if (popup && !e.target.closest('.persona-tile')) {
-          hidePersonaPopup();
+      document.addEventListener('touchend', (e) => {
+        // Check if this was a tap (not a scroll) and if we have a popup
+        if (!window.touchMoved) {
+          const popup = document.getElementById('persona-popup');
+          // If popup exists and touch wasn't on a tile or popup
+          if (popup && !e.target.closest('.persona-tile') && !e.target.closest('.persona-popup')) {
+            hidePersonaPopup();
+          }
         }
       });
+      
+      // Track document touch movement for scroll detection
+      document.addEventListener('touchstart', () => {
+        window.touchMoved = false;
+      });
+      
+      document.addEventListener('touchmove', () => {
+        window.touchMoved = true;
+      });
+      
       document.touchEndInitialized = true;
     }
     
