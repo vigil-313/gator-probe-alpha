@@ -208,6 +208,26 @@
   - Related: [CON-PROBE-035], [CON-PROBE-036]
   - Documents: [DOC-TECH-UI-1]
 
+- [CON-PROBE-038]: End-to-End Testing Framework
+  - Definition: Comprehensive testing approach that verifies full system functionality and component integration
+  - Related: [CON-PROBE-014], [CON-PROBE-018], [CON-PROBE-023], [CON-PROBE-027], [CON-PROBE-039]
+  - Documents: [DOC-DEV-TEST-1]
+
+- [CON-PROBE-039]: Manual Testing Protocol
+  - Definition: Structured checklist-based approach for human verification of system functionality beyond automated tests
+  - Related: [CON-PROBE-038], [CON-PROBE-035]
+  - Documents: [DOC-DEV-TEST-1]
+
+- [CON-PROBE-040]: System Performance Validation
+  - Definition: Testing methodology for verifying system performance under concurrent load and resource usage
+  - Related: [CON-PROBE-038], [CON-PROBE-021], [CON-PROBE-041]
+  - Documents: [DOC-DEV-TEST-1]
+
+- [CON-PROBE-041]: Complete Flow Verification
+  - Definition: Testing approach that validates the entire user journey from initial load to response display
+  - Related: [CON-PROBE-038], [CON-PROBE-039], [CON-PROBE-005]
+  - Documents: [DOC-DEV-TEST-1]
+
 ## System Relationships
 1. [CON-SYS-001] → implements → [CON-SYS-002]
 2. [CON-SYS-001] → organizes by → [CON-SYS-003]
@@ -281,6 +301,15 @@
 64. [CON-PROBE-036] → informs → [CON-PROBE-037] adjustments
 65. [CON-PROBE-037] → improves → system based on user feedback
 66. [CON-PROBE-037] → finalizes → system for production
+67. [CON-PROBE-038] → verifies → complete system functionality
+68. [CON-PROBE-038] → validates → component integration
+69. [CON-PROBE-038] → implements → [CON-PROBE-041]
+70. [CON-PROBE-039] → supplements → [CON-PROBE-038]
+71. [CON-PROBE-039] → captures → UI/UX issues not detected by automated tests
+72. [CON-PROBE-040] → measures → system performance under load
+73. [CON-PROBE-040] → verifies → resource usage and cleanup
+74. [CON-PROBE-041] → tests → complete user journey
+75. [CON-PROBE-041] → validates → all integration points
 
 ## Visual Representation
 ### Documentation System
@@ -479,4 +508,4 @@ Documentation System
 ```
 
 ## Last Updated
-2025-05-18T15:45:00Z | SESSION-013 | Claude
+2025-05-13T22:00:00Z | SESSION-014 | Claude
